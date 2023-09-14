@@ -1,4 +1,4 @@
-package com.bonnjalal.wikiindaba.ui.screen
+package com.bonnjalal.wikiindaba.presentation.ui.screen
 
 import android.app.Activity
 import android.widget.Toast

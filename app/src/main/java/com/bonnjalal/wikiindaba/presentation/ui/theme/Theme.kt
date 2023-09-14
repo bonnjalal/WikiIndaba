@@ -1,4 +1,4 @@
-package com.bonnjalal.wikiindaba.ui.theme
+package com.bonnjalal.wikiindaba.presentation.ui.theme
 
 import android.app.Activity
 import android.os.Build
