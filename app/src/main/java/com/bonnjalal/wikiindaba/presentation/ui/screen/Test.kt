@@ -1,6 +1,7 @@
 package com.bonnjalal.wikiindaba.presentation.ui.screen
 
 import android.app.Activity
+import android.content.Context
 import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -24,14 +25,18 @@ import androidx.compose.material3.ElevatedButton
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilledIconButton
 import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.vectorResource
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.ConstraintSet
@@ -129,19 +134,20 @@ fun Test(context: Activity, name:String, number: Int){
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun Test2(context: Activity){
+fun Test2(){
 
     val scroll = rememberScrollState()
     ConstraintLayout {
         // Create references for the composables to constrain
-        val (column22, img) = createRefs()
+        val (img1,column22, img) = createRefs()
 
-        Column(modifier = Modifier.fillMaxWidth()
+        Column(modifier = Modifier
+            .fillMaxWidth()
             .verticalScroll(state = scroll)
-            .constrainAs(column22){
-            top.linkTo(parent.top, margin = 8.dp)
-            bottom.linkTo(img.top)
-        }) {
+            .constrainAs(column22) {
+                top.linkTo(img1.bottom, margin = 8.dp)
+                bottom.linkTo(img.top)
+            }) {
             Image(painter = painterResource(id = R.drawable.scholarship_logo),
                 contentDescription = "wiki logo", contentScale = ContentScale.Fit)
 
@@ -169,9 +175,9 @@ fun Test2(context: Activity){
             Box(modifier = Modifier
                 .background(color = Color.Blue)
                 .clickable {
-                    Toast
-                        .makeText(context, "box clicked", Toast.LENGTH_SHORT)
-                        .show()
+//                    Toast
+//                        .makeText(context, "box clicked", Toast.LENGTH_SHORT)
+//                        .show()
                 }){
                 Text(text = "Click me")
 
@@ -199,18 +205,18 @@ fun Test2(context: Activity){
             Box(modifier = Modifier
                 .background(color = Color.Blue)
                 .clickable {
-                    Toast
-                        .makeText(context, "box clicked", Toast.LENGTH_SHORT)
-                        .show()
+//                    Toast
+//                        .makeText(context, "box clicked", Toast.LENGTH_SHORT)
+//                        .show()
                 }){
                 Text(text = "Click me")
 
             }
 
             Button(onClick = {
-                Toast
-                    .makeText(context, "box clicked", Toast.LENGTH_SHORT)
-                    .show()
+//                Toast
+//                    .makeText(context, "box clicked", Toast.LENGTH_SHORT)
+//                    .show()
             }) {
                 Text(text = "Click here")
             }
@@ -240,14 +246,32 @@ fun Test2(context: Activity){
         }
 
 
+
         Image(modifier = Modifier
-            .constrainAs(img){
-                             bottom.linkTo(parent.bottom, margin = 8.dp)
+            .fillMaxWidth()
+            .constrainAs(img1) {
+                top.linkTo(parent.top)
                 start.linkTo(parent.start)
                 end.linkTo(parent.end)
             }
-            , painter = painterResource(id = R.drawable.scholarship_logo),
-            contentDescription = "wiki logo", contentScale = ContentScale.Fit)
+            , imageVector = ImageVector.vectorResource(id = R.drawable.top_wave),
+            contentDescription = "wiki logo2", contentScale = ContentScale.FillWidth)
+        Image(modifier = Modifier
+            .fillMaxWidth()
+            .constrainAs(img) {
+                bottom.linkTo(parent.bottom, margin = 0.dp)
+                start.linkTo(parent.start)
+                end.linkTo(parent.end)
+            }
+            , imageVector = ImageVector.vectorResource(id = R.drawable.bottom_wave),
+            contentDescription = "wiki logo", contentScale = ContentScale.FillWidth)
 
+    }
+}
+@Preview
+@Composable
+fun preveiw(){
+    Surface (modifier = Modifier.background(color = Color.White).fillMaxSize()){
+        Test2()
     }
 }

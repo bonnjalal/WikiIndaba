@@ -6,7 +6,7 @@ data class Program(
     var authors: List<String>,
     var date: Double,
     var time: Double,
-    var hall: String,
-    var responsible: String,
-    var resp_image: String
+    var hallNumber: String,
+    var hallResponsible: String,
+    var respImage: String
 )
