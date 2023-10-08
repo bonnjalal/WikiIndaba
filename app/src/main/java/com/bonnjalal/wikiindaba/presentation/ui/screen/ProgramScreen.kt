@@ -2,6 +2,7 @@ package com.bonnjalal.wikiindaba.presentation.ui.screen
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -44,12 +45,14 @@ import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.bonnjalal.wikiindaba.R
+import com.bonnjalal.wikiindaba.common.PROGRAM_SCREEN
+import com.bonnjalal.wikiindaba.common.SCAN_QR_SCREEN
 import com.bonnjalal.wikiindaba.common.compose.CustomTextField
 import com.bonnjalal.wikiindaba.presentation.ui.MainViewModel
 
 
 @Composable
-fun ProgramScreen(vm: MainViewModel = hiltViewModel()){
+fun ProgramScreen(openAndPopUp: (String, String) -> Unit,logout:(String) -> Unit, vm: MainViewModel = hiltViewModel()){
 
     val uiState by vm.searchProgramState
 
@@ -78,7 +81,7 @@ fun ProgramScreen(vm: MainViewModel = hiltViewModel()){
                 contentDescription = "indaba logo", contentScale = ContentScale.FillBounds)
 
             Spacer(modifier = Modifier.fillMaxWidth(0.7f))
-            IconButton(onClick = { /*TODO*/ }, modifier = Modifier.align(Alignment.CenterVertically)) {
+            IconButton(onClick = { vm.onSignOut(logout) }, modifier = Modifier.align(Alignment.CenterVertically)) {
                 Icon(painter = painterResource(id = R.drawable.material_symbols_logout),
                     contentDescription = "logout logo", tint = Color(0xFFF5EEDF)
                 )
@@ -147,7 +150,10 @@ fun ProgramScreen(vm: MainViewModel = hiltViewModel()){
                 // Add 5 items
                 items(10) { index ->
                     ProgramCard(modifier = Modifier.fillMaxWidth(0.85f)
-                        .align(Alignment.CenterHorizontally))
+                        .align(Alignment.CenterHorizontally)
+                        .clickable {
+                            openAndPopUp(SCAN_QR_SCREEN, PROGRAM_SCREEN)
+                        })
                     Spacer(Modifier.height(10.dp))
 
                 }
@@ -272,5 +278,5 @@ fun ProgramCard(modifier: Modifier){
 @Preview
 @Composable
 fun PreviewProgamScreen(){
-    ProgramScreen()
+    ProgramScreen({ str1, str2 -> },{})
 }

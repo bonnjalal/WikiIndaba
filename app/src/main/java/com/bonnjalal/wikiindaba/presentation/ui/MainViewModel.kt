@@ -10,6 +10,8 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.SavedStateHandleSaveableApi
+import com.bonnjalal.wikiindaba.common.LOGIN_SCREEN
+import com.bonnjalal.wikiindaba.common.PROGRAM_SCREEN
 import com.bonnjalal.wikiindaba.common.ext.isValidEmail
 import com.bonnjalal.wikiindaba.common.snackbar.SnackbarManager
 import com.bonnjalal.wikiindaba.data.repository.MainRepository
@@ -21,7 +23,9 @@ import com.bonnjalal.wikiindaba.presentation.state.DataState
 import com.bonnjalal.wikiindaba.presentation.state.LoginUiState
 import dagger.assisted.Assisted
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -55,7 +59,7 @@ class MainViewModel
         loginUiState.value = loginUiState.value.copy(password = newValue)
     }
 
-    fun onSignInClick() {
+    fun onSignInClick(openAndPopUp: (String, String) -> Unit) {
         if (!email.isValidEmail()) {
             SnackbarManager.showMessage(AppText.email_error)
             return
@@ -73,7 +77,24 @@ class MainViewModel
         launchCatching {
             accountService.authenticate(email, password)
             SnackbarManager.showMessage(AppText.login_success)
-//            openAndPopUp(SETTINGS_SCREEN, LOGIN_SCREEN)
+
+            openAndPopUp(PROGRAM_SCREEN, LOGIN_SCREEN)
+        }
+    }
+
+    val userState = accountService.currentUser.map { it.isAnonymous}
+    fun onSignInAnonymously(openAndPopUp: (String, String) -> Unit){
+        launchCatching {
+            accountService.createAnonymousAccount()
+        }
+        SnackbarManager.showMessage(AppText.anonymous_login_success)
+        openAndPopUp(PROGRAM_SCREEN, LOGIN_SCREEN)
+    }
+
+    fun onSignOut (clearAndPopUp: (String) -> Unit){
+        launchCatching {
+            accountService.signOut()
+            clearAndPopUp(LOGIN_SCREEN)
         }
     }
 
@@ -88,6 +109,9 @@ class MainViewModel
             SnackbarManager.showMessage(AppText.recovery_email_sent)
         }
     }
+
+
+
 
     /**
      * Program logic

@@ -1,5 +1,6 @@
 package com.bonnjalal.wikiindaba.presentation.ui.screen
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -20,6 +21,8 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonColors
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ElevatedButton
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilledIconButton
@@ -68,7 +71,7 @@ import com.bonnjalal.wikiindaba.presentation.ui.theme.WikiIndabaTheme
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun LoginScreen(vm: MainViewModel = hiltViewModel()){
+fun LoginScreen(openAndPopUp: (String, String) -> Unit, vm: MainViewModel = hiltViewModel()){
 
     val uiState by vm.loginUiState
 
@@ -133,7 +136,7 @@ fun LoginScreen(vm: MainViewModel = hiltViewModel()){
                 )
             )
 
-            Spacer(Modifier.height(60.dp))
+            Spacer(Modifier.height(55.dp))
 //            var username by remember { mutableStateOf("") }
 //            var username by rememberSaveable { mutableStateOf("") }
             EmailField(uiState.email, vm::onEmailChange)
@@ -143,9 +146,9 @@ fun LoginScreen(vm: MainViewModel = hiltViewModel()){
 //            var password by rememberSaveable { mutableStateOf("") }
             PasswordField(uiState.password, vm::onPasswordChange)
 
-            Spacer(modifier = Modifier.height(50.dp))
+            Spacer(modifier = Modifier.height(40.dp))
             Box (modifier = Modifier
-                .height(52.dp)
+                .height(45.dp)
                 .fillMaxWidth()
 //                .padding(top = 40.dp)
                 .background(
@@ -153,7 +156,7 @@ fun LoginScreen(vm: MainViewModel = hiltViewModel()){
                     shape = RoundedCornerShape(size = 10.dp)
                 )
                 .clickable {
-                           vm.onSignInClick()
+                    vm.onSignInClick(openAndPopUp)
                 },
                 contentAlignment = Alignment.Center) {
 
@@ -168,7 +171,25 @@ fun LoginScreen(vm: MainViewModel = hiltViewModel()){
                 )
             }
 
-            Spacer(modifier = Modifier.height(60.dp))
+            Spacer(modifier = Modifier.height(10.dp))
+            OutlinedButton(
+                modifier = Modifier.height(50.dp)
+                    .fillMaxWidth(),
+                border = BorderStroke(color = Color(0xFF531B1C), width = 1.5.dp),
+                shape = RoundedCornerShape(size = 10.dp),
+                onClick = { vm.onSignInAnonymously(openAndPopUp)}) {
+                Text(
+                    text = "Sign in Anonymously",
+                    style = TextStyle(
+                        fontSize = 17.sp,
+//                        fontFamily = FontFamily(Font(R.font.poppins)),
+                        fontWeight = FontWeight(400),
+                        color = Color(0xFF531B1C),
+                    )
+                )
+            }
+
+            Spacer(modifier = Modifier.height(50.dp))
             Text(
                 text = "If you encounter difficulties in registering, please kindly contact one of the WikiIndaba 2023 organizing members to connect you with the responsible team for the application.",
                 style = TextStyle(
@@ -282,6 +303,6 @@ fun preveiwLogin(){
     Surface (modifier = Modifier
         .background(color = Color.White)
         .fillMaxSize()){
-        LoginScreen()
+        LoginScreen({str1, str2 -> })
     }
 }

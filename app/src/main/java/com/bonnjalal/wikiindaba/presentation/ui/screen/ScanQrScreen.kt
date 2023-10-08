@@ -34,7 +34,7 @@ import com.bonnjalal.wikiindaba.presentation.ui.MainViewModel
 
 
 @Composable
-fun ScanQrScreen (vm:MainViewModel = hiltViewModel()) {
+fun ScanQrScreen (openAndPopUp: (String, String) -> Unit,popup: () -> Unit, vm:MainViewModel = hiltViewModel()) {
     Column (modifier = Modifier
         .background(color = Color(0xFFFFFFFF))
         .fillMaxSize()) {
@@ -56,7 +56,7 @@ fun ScanQrScreen (vm:MainViewModel = hiltViewModel()) {
 
             IconButton(
                 modifier = Modifier.align(Alignment.Top),
-                onClick = { /*TODO*/ }) {
+                onClick = { popup() }) {
                 Icon(imageVector = ImageVector.vectorResource(id = R.drawable.go_back),
                     contentDescription = "back icon")
             }

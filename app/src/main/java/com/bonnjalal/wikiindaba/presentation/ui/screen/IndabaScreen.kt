@@ -18,15 +18,17 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.bonnjalal.wikiindaba.common.LOGIN_SCREEN
+import com.bonnjalal.wikiindaba.common.PROGRAM_SCREEN
+import com.bonnjalal.wikiindaba.common.SCAN_QR_SCREEN
 import com.bonnjalal.wikiindaba.common.snackbar.SnackbarManager
-import com.bonnjalal.wikiindaba.presentation.state.MakeItSoAppState
+import com.bonnjalal.wikiindaba.presentation.state.IndabaAppState
 import kotlinx.coroutines.CoroutineScope
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
@@ -57,10 +59,19 @@ fun IndabaScreen() {
 
         ) {
             // Screen content
-            NavHost(navController = appState.navController, startDestination = "login") {
-//                composable("login") { LoginScreen() }
-//                composable("login") { ProgramScreen() }
-                composable("login") { ScanQrScreen() }
+            NavHost(navController = appState.navController, startDestination = LOGIN_SCREEN) {
+                composable(LOGIN_SCREEN) { LoginScreen(openAndPopUp = { route, popUp -> appState.navigateAndPopUp(route, popUp) }) }
+                composable(PROGRAM_SCREEN) {
+                    ProgramScreen(
+                        openAndPopUp = { route, popUp -> appState.navigateAndPopUp(route, popUp) },
+                        logout = {route -> appState.clearAndNavigate(route)})
+                }
+                composable(SCAN_QR_SCREEN) {
+                    ScanQrScreen(
+                        openAndPopUp = { route, popUp -> appState.navigateAndPopUp(route, popUp) },
+                        popup = {appState.popUp()}
+                    )
+                }
             }
         }
 
@@ -78,7 +89,7 @@ fun rememberAppState(
     coroutineScope: CoroutineScope = rememberCoroutineScope()
 ) =
     remember(snackbarHostState, navController, snackbarManager, resources, coroutineScope) {
-        MakeItSoAppState(snackbarHostState, navController, snackbarManager, resources, coroutineScope)
+        IndabaAppState(snackbarHostState, navController, snackbarManager, resources, coroutineScope)
     }
 
 @Composable

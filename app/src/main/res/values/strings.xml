@@ -19,6 +19,8 @@
     <string name="empty_password_error">Password cannot be empty.</string>
     <string name="empty_username_error">Username cannot be empty.</string>
     <string name="login_success">Login Success.</string>
+    <string name="anonymous_login_success">Anonymous Login Success.</string>
+
 
 
     <!-- SignUpScreen -->
