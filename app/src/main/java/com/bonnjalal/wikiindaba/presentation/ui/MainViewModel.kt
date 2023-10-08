@@ -89,6 +89,17 @@ class MainViewModel
         }
     }
 
+    /**
+     * Program logic
+     */
+
+    var searchProgramState = mutableStateOf("")
+        private set
+    fun onProgramSearchChange(newValue: String) {
+        searchProgramState.value = newValue
+    }
+
+
 
 
     private val _dataStateAttendee : MutableLiveData<DataState<List<Attendee>>> = MutableLiveData()

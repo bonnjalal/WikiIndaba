@@ -58,9 +58,9 @@ fun IndabaScreen() {
         ) {
             // Screen content
             NavHost(navController = appState.navController, startDestination = "login") {
-                composable("login") { LoginScreen() }
-//        composable("friendslist") { FriendsList(/*...*/) }
-                /*...*/
+//                composable("login") { LoginScreen() }
+//                composable("login") { ProgramScreen() }
+                composable("login") { ScanQrScreen() }
             }
         }
 
