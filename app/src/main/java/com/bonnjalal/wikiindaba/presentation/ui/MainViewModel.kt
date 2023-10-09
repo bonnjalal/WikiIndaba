@@ -59,7 +59,7 @@ class MainViewModel
         loginUiState.value = loginUiState.value.copy(password = newValue)
     }
 
-    fun onSignInClick(openAndPopUp: (String, String) -> Unit) {
+    fun onSignInClick(navigateAndPopup: (String, String) -> Unit) {
         if (!email.isValidEmail()) {
             SnackbarManager.showMessage(AppText.email_error)
             return
@@ -78,17 +78,17 @@ class MainViewModel
             accountService.authenticate(email, password)
             SnackbarManager.showMessage(AppText.login_success)
 
-            openAndPopUp(PROGRAM_SCREEN, LOGIN_SCREEN)
+            navigateAndPopup(PROGRAM_SCREEN, LOGIN_SCREEN)
         }
     }
 
     val userState = accountService.currentUser.map { it.isAnonymous}
-    fun onSignInAnonymously(openAndPopUp: (String, String) -> Unit){
+    fun onSignInAnonymously(navigateAndPopup: (String, String) -> Unit){
         launchCatching {
             accountService.createAnonymousAccount()
         }
         SnackbarManager.showMessage(AppText.anonymous_login_success)
-        openAndPopUp(PROGRAM_SCREEN, LOGIN_SCREEN)
+        navigateAndPopup(PROGRAM_SCREEN, LOGIN_SCREEN)
     }
 
     fun onSignOut (clearAndPopUp: (String) -> Unit){

@@ -12,13 +12,16 @@ import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.ReadOnlyComposable
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
@@ -37,45 +40,48 @@ import kotlinx.coroutines.CoroutineScope
 fun IndabaScreen() {
 //    val navController = rememberNavController()
 
-    Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
 
-        val appState = rememberAppState()
+    CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Ltr ) {
+        Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
+
+            val appState = rememberAppState()
 
 
 
 //        val snackbarHostState = remember { SnackbarHostState() }
-        Scaffold(
-            modifier = Modifier.fillMaxSize(),
-            snackbarHost = {
+            Scaffold(
+                modifier = Modifier.fillMaxSize(),
+                snackbarHost = {
 //                SnackbarHost(hostState = snackbarHostState)
-                SnackbarHost(
-                    hostState = appState.snackbarHostState,
-                    modifier = Modifier.padding(8.dp),
-                    snackbar = { snackbarData ->
-                        Snackbar(snackbarData)
-                    }
-                )
-            },
-
-        ) {
-            // Screen content
-            NavHost(navController = appState.navController, startDestination = LOGIN_SCREEN) {
-                composable(LOGIN_SCREEN) { LoginScreen(openAndPopUp = { route, popUp -> appState.navigateAndPopUp(route, popUp) }) }
-                composable(PROGRAM_SCREEN) {
-                    ProgramScreen(
-                        openAndPopUp = { route, popUp -> appState.navigateAndPopUp(route, popUp) },
-                        logout = {route -> appState.clearAndNavigate(route)})
-                }
-                composable(SCAN_QR_SCREEN) {
-                    ScanQrScreen(
-                        openAndPopUp = { route, popUp -> appState.navigateAndPopUp(route, popUp) },
-                        popup = {appState.popUp()}
+                    SnackbarHost(
+                        hostState = appState.snackbarHostState,
+                        modifier = Modifier.padding(8.dp),
+                        snackbar = { snackbarData ->
+                            Snackbar(snackbarData)
+                        }
                     )
+                },
+
+                ) {
+                // Screen content
+                NavHost(navController = appState.navController, startDestination = LOGIN_SCREEN) {
+                    composable(LOGIN_SCREEN) { LoginScreen(navigateAndPopup = { route, popup -> appState.navigateAndPopUp(route, popup) }) }
+                    composable(PROGRAM_SCREEN) {
+                        ProgramScreen(
+                            navigate = { route -> appState.navigate(route) },
+                            logout = {route -> appState.clearAndNavigate(route)})
+                    }
+                    composable(SCAN_QR_SCREEN) {
+                        ScanQrScreen(
+                            openAndPopUp = { route, popUp -> appState.navigateAndPopUp(route, popUp) },
+                            popup = { -> appState.popUp()}
+                        )
+                    }
                 }
             }
         }
-
     }
+
 
 }
 

@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -65,13 +66,17 @@ import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.bonnjalal.wikiindaba.R
+import com.bonnjalal.wikiindaba.common.compose.CustomTextField
 import com.bonnjalal.wikiindaba.presentation.ui.MainViewModel
 import com.bonnjalal.wikiindaba.presentation.ui.theme.WikiIndabaTheme
+import com.slaviboy.composeunits.dh
+import com.slaviboy.composeunits.dw
+import com.slaviboy.composeunits.sh
 
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun LoginScreen(openAndPopUp: (String, String) -> Unit, vm: MainViewModel = hiltViewModel()){
+fun LoginScreen(navigateAndPopup: (String, String) -> Unit, vm: MainViewModel = hiltViewModel()){
 
     val uiState by vm.loginUiState
 
@@ -98,8 +103,8 @@ fun LoginScreen(openAndPopUp: (String, String) -> Unit, vm: MainViewModel = hilt
             
             Spacer(modifier = Modifier.fillMaxSize(0.1f))
             Image(modifier = Modifier
-                .width(160.dp)
-                .height(60.dp)
+                .width(0.30.dw)
+                .height(0.06.dh)
 //            .size(width = 160.dp, height = 60.dp)
                 , imageVector = ImageVector.vectorResource(id = R.drawable.logo_wikiindaba),
                 contentDescription = "indaba logo", contentScale = ContentScale.FillBounds)
@@ -111,7 +116,7 @@ fun LoginScreen(openAndPopUp: (String, String) -> Unit, vm: MainViewModel = hilt
             .constrainAs(col1) {
                 height = Dimension.fillToConstraints
 //                width = Dimension.matchParent
-                top.linkTo(img2.bottom, 60.dp)
+                top.linkTo(img2.bottom, 0.04.dh)
                 start.linkTo(parent.start)
                 end.linkTo(parent.end)
                 bottom.linkTo(img.top, margin = 8.dp)
@@ -121,7 +126,7 @@ fun LoginScreen(openAndPopUp: (String, String) -> Unit, vm: MainViewModel = hilt
             Text(
                 text = "Sign in",
                 style = TextStyle(
-                    fontSize = 26.sp,
+                    fontSize = 0.03.sh,
 //                    fontFamily = FontFamily(Font(R.font.inter)),
                     fontWeight = FontWeight(600),
                     color = Color(0xFF1C2813),
@@ -130,40 +135,42 @@ fun LoginScreen(openAndPopUp: (String, String) -> Unit, vm: MainViewModel = hilt
             Text(
                 text = "Please fill the credentials",
                 style = TextStyle(
-                    fontSize = 14.sp,
+                    fontSize = 0.015.sh,
                     fontWeight = FontWeight(500),
                     color = Color.Gray,
                 )
             )
 
-            Spacer(Modifier.height(55.dp))
+            Spacer(Modifier.height(0.055.dh))
 //            var username by remember { mutableStateOf("") }
 //            var username by rememberSaveable { mutableStateOf("") }
-            EmailField(uiState.email, vm::onEmailChange)
+            EmailField(uiState.email, vm::onEmailChange,
+                modifier = Modifier.height(0.05.dh).fillMaxWidth())
 
-            Spacer(Modifier.height(20.dp))
+            Spacer(Modifier.height(0.02.dh))
 //            var password by remember { mutableStateOf("") }
 //            var password by rememberSaveable { mutableStateOf("") }
-            PasswordField(uiState.password, vm::onPasswordChange)
+            PasswordField(uiState.password, vm::onPasswordChange,
+                modifier = Modifier.height(0.05.dh).fillMaxWidth())
 
-            Spacer(modifier = Modifier.height(40.dp))
+            Spacer(modifier = Modifier.height(0.04.dh))
             Box (modifier = Modifier
-                .height(45.dp)
+                .height(0.05.dh)
                 .fillMaxWidth()
 //                .padding(top = 40.dp)
                 .background(
                     color = Color(0xFF531B1C),
-                    shape = RoundedCornerShape(size = 10.dp)
+                    shape = RoundedCornerShape(size = 0.01.dh)
                 )
                 .clickable {
-                    vm.onSignInClick(openAndPopUp)
+                    vm.onSignInClick(navigateAndPopup)
                 },
                 contentAlignment = Alignment.Center) {
 
                 Text(
                     text = "Sign in",
                     style = TextStyle(
-                        fontSize = 17.sp,
+                        fontSize = 0.02.sh,
 //                        fontFamily = FontFamily(Font(R.font.poppins)),
                         fontWeight = FontWeight(400),
                         color = Color(0xFFFFFFFF),
@@ -171,17 +178,20 @@ fun LoginScreen(openAndPopUp: (String, String) -> Unit, vm: MainViewModel = hilt
                 )
             }
 
-            Spacer(modifier = Modifier.height(10.dp))
+            Spacer(modifier = Modifier.height(0.012.dh))
             OutlinedButton(
-                modifier = Modifier.height(50.dp)
-                    .fillMaxWidth(),
+                modifier = Modifier
+//                    .offset(x = 0.07.dw, y = 0.2.dh)
+                    .height(0.05.dh)
+                    .fillMaxWidth()
+                        ,
                 border = BorderStroke(color = Color(0xFF531B1C), width = 1.5.dp),
-                shape = RoundedCornerShape(size = 10.dp),
-                onClick = { vm.onSignInAnonymously(openAndPopUp)}) {
+                shape = RoundedCornerShape(size = 0.01.dh),
+                onClick = { vm.onSignInAnonymously(navigateAndPopup)}) {
                 Text(
                     text = "Sign in Anonymously",
                     style = TextStyle(
-                        fontSize = 17.sp,
+                        fontSize = 0.02.sh,
 //                        fontFamily = FontFamily(Font(R.font.poppins)),
                         fontWeight = FontWeight(400),
                         color = Color(0xFF531B1C),
@@ -189,12 +199,12 @@ fun LoginScreen(openAndPopUp: (String, String) -> Unit, vm: MainViewModel = hilt
                 )
             }
 
-            Spacer(modifier = Modifier.height(50.dp))
+            Spacer(modifier = Modifier.height(0.05.dh))
             Text(
                 text = "If you encounter difficulties in registering, please kindly contact one of the WikiIndaba 2023 organizing members to connect you with the responsible team for the application.",
                 style = TextStyle(
-                    fontSize = 14.sp,
-                    lineHeight = 17.sp,
+                    fontSize = 0.018.sh,
+//                    lineHeight = 17.sp,
 //                    fontFamily = FontFamily(Font(R.font.poppins)),
                     fontWeight = FontWeight(500),
                     color = Color(0xFFA1A1A1),
@@ -221,9 +231,9 @@ fun LoginScreen(openAndPopUp: (String, String) -> Unit, vm: MainViewModel = hilt
 @Composable
 fun EmailField(value: String,  onNewValue: (String) -> Unit, modifier: Modifier = Modifier) {
 
-    TextField(modifier = Modifier
+    CustomTextField(modifier = modifier,
 //                .padding(top = 60.dp)
-        .fillMaxWidth(),
+//        .fillMaxWidth(),
 //                .height(52.dp),
         singleLine = true,
         leadingIcon = {
@@ -237,10 +247,10 @@ fun EmailField(value: String,  onNewValue: (String) -> Unit, modifier: Modifier 
             unfocusedIndicatorColor = Color.Transparent,
             disabledIndicatorColor = Color.Transparent
         ),
-        shape = RoundedCornerShape(size = 10.dp),
+        shape = RoundedCornerShape(size = 0.01.dh),
         value = value,
         textStyle = TextStyle(
-            fontSize = 14.sp,
+            fontSize = 0.015.sh,
 //                        fontFamily = FontFamily(Font(R.font.poppins)),
             fontWeight = FontWeight(400),
             color = Color(0xFFA39274),
@@ -256,10 +266,11 @@ fun PasswordField(value: String,  onNewValue: (String) -> Unit, modifier: Modifi
     val image = if (passwordVisible)
         ImageVector.vectorResource(R.drawable.eye)
     else ImageVector.vectorResource(R.drawable.eye_off)
-    TextField(
-        modifier = Modifier
+    CustomTextField(
+        singleLine = true,
+        modifier = modifier,
 //                .padding(top = 20.dp)
-            .fillMaxWidth(),
+//            .fillMaxWidth(),
 //                .height(52.dp),
         leadingIcon = {
             Icon(
@@ -275,12 +286,11 @@ fun PasswordField(value: String,  onNewValue: (String) -> Unit, modifier: Modifi
             unfocusedIndicatorColor = Color.Transparent,
             disabledIndicatorColor = Color.Transparent
         ),
-        shape = RoundedCornerShape(size = 10.dp),
+        shape = RoundedCornerShape(size = 0.01.dh),
         value = value,
         visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
         trailingIcon = {
-
             // Please provide localized description for accessibility services
             val description = if (passwordVisible) "Hide password" else "Show password"
 
@@ -289,7 +299,7 @@ fun PasswordField(value: String,  onNewValue: (String) -> Unit, modifier: Modifi
             }
         },
         textStyle = TextStyle (
-            fontSize = 14.sp,
+            fontSize = 0.015.sh,
 //                        fontFamily = FontFamily(Font(R.font.poppins)),
             fontWeight = FontWeight(400),
             color = Color(0xFFA39274),
@@ -303,6 +313,6 @@ fun preveiwLogin(){
     Surface (modifier = Modifier
         .background(color = Color.White)
         .fillMaxSize()){
-        LoginScreen({str1, str2 -> })
+        LoginScreen({str1, str2 ->})
     }
 }

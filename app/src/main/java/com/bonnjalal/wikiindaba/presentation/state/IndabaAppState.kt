@@ -4,6 +4,7 @@ import android.content.res.Resources
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Stable
 import androidx.navigation.NavHostController
+import com.bonnjalal.wikiindaba.R
 import com.bonnjalal.wikiindaba.common.snackbar.SnackbarManager
 import com.bonnjalal.wikiindaba.common.snackbar.SnackbarMessage.Companion.toMessage
 import kotlinx.coroutines.CoroutineScope
@@ -29,6 +30,7 @@ class IndabaAppState(
 
     fun popUp() {
         navController.popBackStack()
+        SnackbarManager.showMessage(R.string.anonymous_login_success)
     }
 
     fun navigate(route: String) {

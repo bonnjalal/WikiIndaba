@@ -104,6 +104,9 @@ dependencies {
     val nav_version = "2.7.4"
     implementation("androidx.navigation:navigation-compose:$nav_version")
 
+    // percentage instead of db
+    implementation ("com.github.slaviboy:JetpackComposePercentageUnits:1.0.0")
+
 
 }
 

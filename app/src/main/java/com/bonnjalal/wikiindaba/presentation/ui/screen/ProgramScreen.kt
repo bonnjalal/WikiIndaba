@@ -25,6 +25,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -49,12 +50,16 @@ import com.bonnjalal.wikiindaba.common.PROGRAM_SCREEN
 import com.bonnjalal.wikiindaba.common.SCAN_QR_SCREEN
 import com.bonnjalal.wikiindaba.common.compose.CustomTextField
 import com.bonnjalal.wikiindaba.presentation.ui.MainViewModel
+import com.slaviboy.composeunits.dh
+import com.slaviboy.composeunits.dw
+import com.slaviboy.composeunits.sh
 
 
 @Composable
-fun ProgramScreen(openAndPopUp: (String, String) -> Unit,logout:(String) -> Unit, vm: MainViewModel = hiltViewModel()){
+fun ProgramScreen(navigate: (String) -> Unit,logout:(String) -> Unit, vm: MainViewModel = hiltViewModel()){
 
     val uiState by vm.searchProgramState
+    val userStateAnonymous by vm.userState.collectAsState(initial = true)
 
     ConstraintLayout(modifier = Modifier
         .fillMaxSize()
@@ -66,15 +71,15 @@ fun ProgramScreen(openAndPopUp: (String, String) -> Unit,logout:(String) -> Unit
             .constrainAs(logo) {
                 height = Dimension.wrapContent
                 width = Dimension.fillToConstraints
-                top.linkTo(parent.top, margin = 18.dp)
+                top.linkTo(parent.top, margin = 0.008.dh)
                 start.linkTo(parent.start)
                 end.linkTo(parent.end)
             }){
 
             Spacer(modifier = Modifier.fillMaxWidth(0.1f))
             Image(modifier = Modifier
-                .width(120.dp)
-                .height(35.dp)
+                .width(0.25.dw)
+                .height(0.035.dh)
                 .align(Alignment.CenterVertically)
 //            .size(width = 160.dp, height = 60.dp)
                 , imageVector = ImageVector.vectorResource(id = R.drawable.logo_wikiindaba),
@@ -92,10 +97,10 @@ fun ProgramScreen(openAndPopUp: (String, String) -> Unit,logout:(String) -> Unit
 //            .fillMaxWidth(0.85f)
             .background(
                 color = Color.White,
-                shape = RoundedCornerShape(topStart = 35.dp, topEnd = 35.dp)
+                shape = RoundedCornerShape(topStart = 0.035.dh, topEnd = 0.035.dh)
             )
             .constrainAs(col1) {
-                top.linkTo(logo.bottom, margin = 15.dp)
+                top.linkTo(logo.bottom, margin = 0.015.dh)
                 start.linkTo(parent.start)
                 end.linkTo(parent.end)
                 bottom.linkTo(parent.bottom)
@@ -112,8 +117,8 @@ fun ProgramScreen(openAndPopUp: (String, String) -> Unit,logout:(String) -> Unit
                     modifier = Modifier.align(Alignment.CenterVertically),
                     text = "Hello, Zakaria ",
                     style = TextStyle(
-                        fontSize = 24.sp,
-                        lineHeight = 17.sp,
+                        fontSize = 0.025.sh,
+//                        lineHeight = 17.sp,
 //                        fontFamily = FontFamily(Font(R.font.inter)),
                         fontWeight = FontWeight(600),
                         color = Color(0xFF000000),
@@ -122,9 +127,9 @@ fun ProgramScreen(openAndPopUp: (String, String) -> Unit,logout:(String) -> Unit
 
                 Image(
                     modifier = Modifier
-                        .padding(start = 8.dp)
-                        .height(25.dp)
-                        .width(25.dp)
+                        .padding(start = 0.008.dp)
+                        .height(0.025.dh)
+                        .width(0.050.dw)
                         .align(Alignment.CenterVertically),
                     painter = painterResource(id = R.drawable.emoji_waving_hand_sign),
                     contentDescription = "image description",
@@ -132,15 +137,15 @@ fun ProgramScreen(openAndPopUp: (String, String) -> Unit,logout:(String) -> Unit
                 )
             }
 
-            Spacer(Modifier.height(35.dp))
+            Spacer(Modifier.height(0.035.dh))
             SearchField(uiState, vm::onProgramSearchChange,
                 modifier = Modifier
                     .fillMaxWidth(0.85f)
-                    .height(40.dp)
+                    .height(0.04.dh)
 //                    .defaultMinSize(minHeight = 20.dp, minWidth = 150.dp)
                     .align(Alignment.CenterHorizontally))
 
-            Spacer(Modifier.height(35.dp))
+            Spacer(Modifier.height(0.03.dh))
             LazyColumn (modifier = Modifier.align(Alignment.CenterHorizontally)){
                 // Add a single item
 //                item {
@@ -149,12 +154,13 @@ fun ProgramScreen(openAndPopUp: (String, String) -> Unit,logout:(String) -> Unit
 
                 // Add 5 items
                 items(10) { index ->
-                    ProgramCard(modifier = Modifier.fillMaxWidth(0.85f)
+                    ProgramCard(modifier = Modifier
+                        .fillMaxWidth(0.85f)
                         .align(Alignment.CenterHorizontally)
                         .clickable {
-                            openAndPopUp(SCAN_QR_SCREEN, PROGRAM_SCREEN)
+                            if (!userStateAnonymous) navigate(SCAN_QR_SCREEN)
                         })
-                    Spacer(Modifier.height(10.dp))
+                    Spacer(Modifier.height(0.01.dh))
 
                 }
 
@@ -214,42 +220,42 @@ fun SearchField(value: String,  onNewValue: (String) -> Unit, modifier: Modifier
 fun ProgramCard(modifier: Modifier){
     Column (modifier = modifier
 //        .padding(horizontal = 8.dp)
-        .background(color = Color(0xFFF5EEDF), shape = RoundedCornerShape(size = 12.dp)) ) {
+        .background(color = Color(0xFFF5EEDF), shape = RoundedCornerShape(size = 0.012.dh)) ) {
 
         Text(
-            modifier = Modifier.padding(start = 16.dp, top = 8.dp, end = 16.dp),
+            modifier = Modifier.padding(start = 0.03.dw, top = 8.dp, end = 0.03.dw),
             text = "How to become an administrator on the English Wikipedia",
             style = TextStyle(
-                fontSize = 16.sp,
-                lineHeight = 17.sp,
+                fontSize = 0.016.sh,
+//                lineHeight = 17.sp,
 //                fontFamily = FontFamily(Font(R.font.inter)),
                 fontWeight = FontWeight(500),
                 color = Color(0xFF531B1C),
             )
         )
         Text(
-            modifier = Modifier.padding(start = 16.dp, top = 4.dp, end = 16.dp),
+            modifier = Modifier.padding(start = 0.03.dw, top = 0.004.dh, end = 0.03.dw),
             text = "WereSpielChequers",
             style = TextStyle(
-                fontSize = 13.sp,
-                lineHeight = 17.sp,
+                fontSize = 0.013.sh,
+//                lineHeight = 17.sp,
 //                fontFamily = FontFamily(Font(R.font.inter)),
                 fontWeight = FontWeight(400),
                 color = Color(0xFF531B1C),
             )
         )
-        Row (modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)) {
+        Row (modifier = Modifier.padding(horizontal = 0.016.dh, vertical = 0.008.dh)) {
             Icon(
                 modifier = Modifier.padding(1.dp),
                 imageVector = ImageVector.vectorResource(id = R.drawable.location_icon),
                 contentDescription = "location icon",
                 tint =Color(0xFFA1A1A1) )
             Text(
-                modifier = Modifier.padding(horizontal = 8.dp),
+                modifier = Modifier.padding(horizontal = 0.016.dw),
                 text = "Room 2",
                 style = TextStyle(
-                    fontSize = 11.sp,
-                    lineHeight = 17.sp,
+                    fontSize = 0.011.sh,
+//                    lineHeight = 17.sp,
 //                    fontFamily = FontFamily(Font(R.font.inter)),
                     fontWeight = FontWeight(500),
                     color = Color(0xFFA1A1A1),
@@ -262,11 +268,11 @@ fun ProgramCard(modifier: Modifier){
                 contentDescription = "location icon",
                 tint = Color(0xFFA1A1A1))
             Text(
-                modifier = Modifier.padding(horizontal = 8.dp),
+                modifier = Modifier.padding(horizontal = 0.016.dw),
                 text = "22 Nov, 13:00 - 13:30",
                 style = TextStyle(
-                    fontSize = 11.sp,
-                    lineHeight = 17.sp,
+                    fontSize = 0.011.sh,
+//                    lineHeight = 17.sp,
 //                    fontFamily = FontFamily(Font(R.font.inter)),
                     fontWeight = FontWeight(500),
                     color = Color(0xFFA1A1A1),
@@ -278,5 +284,5 @@ fun ProgramCard(modifier: Modifier){
 @Preview
 @Composable
 fun PreviewProgamScreen(){
-    ProgramScreen({ str1, str2 -> },{})
+    ProgramScreen({ str1 -> },{})
 }

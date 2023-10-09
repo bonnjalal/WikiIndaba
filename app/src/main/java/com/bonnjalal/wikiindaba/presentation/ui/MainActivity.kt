@@ -17,6 +17,7 @@ import com.bonnjalal.wikiindaba.presentation.ui.screen.LoginScreen
 import com.bonnjalal.wikiindaba.presentation.ui.screen.Test
 import com.bonnjalal.wikiindaba.presentation.ui.screen.Test2
 import com.bonnjalal.wikiindaba.presentation.ui.theme.WikiIndabaTheme
+import com.slaviboy.composeunits.initSize
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -25,26 +26,15 @@ class MainActivity : ComponentActivity() {
     val viewModel: MainViewModel by viewModels()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        initSize()
         setContent {
             WikiIndabaTheme {
-
                 // A surface container using the 'background' color from the theme
                IndabaScreen()
             }
         }
     }
 }
-
-@Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-
-    Text(
-            text = "Hello $name!",
-            modifier = modifier
-    )
-}
-
-
 
 @Preview(showBackground = true)
 @Composable
