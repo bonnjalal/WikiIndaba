@@ -1,13 +1,9 @@
 package com.bonnjalal.wikiindaba.presentation.ui
 
-import android.widget.Toast
-import androidx.compose.material3.Snackbar
-import androidx.compose.material3.SnackbarData
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.SavedStateHandle
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.SavedStateHandleSaveableApi
 import com.bonnjalal.wikiindaba.common.LOGIN_SCREEN
@@ -18,12 +14,10 @@ import com.bonnjalal.wikiindaba.data.repository.MainRepository
 import com.bonnjalal.wikiindaba.presentation.model.Attendee
 import com.bonnjalal.wikiindaba.presentation.model.Organizer
 import com.bonnjalal.wikiindaba.presentation.model.Program
-import com.bonnjalal.wikiindaba.presentation.service.AccountService
+import com.bonnjalal.wikiindaba.data.online.service.AccountService
 import com.bonnjalal.wikiindaba.presentation.state.DataState
 import com.bonnjalal.wikiindaba.presentation.state.LoginUiState
-import dagger.assisted.Assisted
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach

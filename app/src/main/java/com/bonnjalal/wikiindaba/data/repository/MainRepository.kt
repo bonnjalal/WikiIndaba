@@ -1,8 +1,8 @@
 package com.bonnjalal.wikiindaba.data.repository
 
-import com.bonnjalal.wikiindaba.data.db.CacheEntity.mapper.AttendeeCacheMapper
-import com.bonnjalal.wikiindaba.data.db.CacheEntity.mapper.OrganizerCacheMapper
-import com.bonnjalal.wikiindaba.data.db.CacheEntity.mapper.ProgramCacheMapper
+import com.bonnjalal.wikiindaba.data.online.online_entity.mapper.AttendeeOnlineMapper
+import com.bonnjalal.wikiindaba.data.online.online_entity.mapper.OrganizerOnlineMapper
+import com.bonnjalal.wikiindaba.data.online.online_entity.mapper.ProgramOnlineMapper
 import com.bonnjalal.wikiindaba.data.db.dao.AttendeeDao
 import com.bonnjalal.wikiindaba.data.db.dao.OrganizerDao
 import com.bonnjalal.wikiindaba.data.db.dao.ProgramDao
@@ -18,9 +18,9 @@ constructor(
     private val attendeeDao: AttendeeDao,
     private val organizerDao: OrganizerDao,
     private val programDao: ProgramDao,
-    private val attendeeCacheMapper: AttendeeCacheMapper,
-    private val organizerCacheMapper: OrganizerCacheMapper,
-    private val programCacheMapper: ProgramCacheMapper
+    private val attendeeCacheMapper: AttendeeOnlineMapper,
+    private val organizerCacheMapper: OrganizerOnlineMapper,
+    private val programCacheMapper: ProgramOnlineMapper
 ){
     suspend fun getAttendees() : Flow<DataState<List<Attendee>>> = flow {
         emit(DataState.Loading)

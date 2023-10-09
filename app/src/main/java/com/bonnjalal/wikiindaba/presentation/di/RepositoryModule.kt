@@ -1,8 +1,8 @@
 package com.bonnjalal.wikiindaba.presentation.di
 
-import com.bonnjalal.wikiindaba.data.db.CacheEntity.mapper.AttendeeCacheMapper
-import com.bonnjalal.wikiindaba.data.db.CacheEntity.mapper.OrganizerCacheMapper
-import com.bonnjalal.wikiindaba.data.db.CacheEntity.mapper.ProgramCacheMapper
+import com.bonnjalal.wikiindaba.data.online.online_entity.mapper.AttendeeOnlineMapper
+import com.bonnjalal.wikiindaba.data.online.online_entity.mapper.OrganizerOnlineMapper
+import com.bonnjalal.wikiindaba.data.online.online_entity.mapper.ProgramOnlineMapper
 import com.bonnjalal.wikiindaba.data.db.dao.AttendeeDao
 import com.bonnjalal.wikiindaba.data.db.dao.OrganizerDao
 import com.bonnjalal.wikiindaba.data.db.dao.ProgramDao
@@ -24,9 +24,9 @@ object RepositoryModule {
         attendeeDao: AttendeeDao,
         organizerDao: OrganizerDao,
         programDao: ProgramDao,
-        attendeeCacheMapper: AttendeeCacheMapper,
-        organizerCacheMapper: OrganizerCacheMapper,
-        programCacheMapper: ProgramCacheMapper
+        attendeeCacheMapper: AttendeeOnlineMapper,
+        organizerCacheMapper: OrganizerOnlineMapper,
+        programCacheMapper: ProgramOnlineMapper
     ): MainRepository {
         return MainRepository(attendeeDao, organizerDao, programDao, attendeeCacheMapper, organizerCacheMapper, programCacheMapper)
     }

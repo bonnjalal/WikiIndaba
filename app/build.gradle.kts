@@ -100,12 +100,22 @@ dependencies {
     // Firebase
     implementation(platform("com.google.firebase:firebase-bom:32.3.1"))
     implementation ("com.google.firebase:firebase-auth-ktx")
+    implementation("com.google.firebase:firebase-firestore-ktx")
 
     val nav_version = "2.7.4"
     implementation("androidx.navigation:navigation-compose:$nav_version")
 
     // percentage instead of db
     implementation ("com.github.slaviboy:JetpackComposePercentageUnits:1.0.0")
+
+    // tracing
+    implementation ("androidx.tracing:tracing-ktx:1.1.0")
+
+
+//    implementation ("com.google.api-client:google-api-client:2.0.0")
+//    implementation ("com.google.oauth-client:google-oauth-client-jetty:1.34.1")
+//    implementation ("com.google.apis:google-api-services-sheets:v4-rev20220927-2.0.0")
+
 
 
 }
