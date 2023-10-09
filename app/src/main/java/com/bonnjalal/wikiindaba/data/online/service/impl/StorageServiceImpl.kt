@@ -1,6 +1,5 @@
 package com.bonnjalal.wikiindaba.data.online.service.impl;
 
-import androidx.core.os.trace
 import androidx.tracing.traceAsync
 import com.bonnjalal.wikiindaba.data.online.online_entity.AttendeeOnlineEntity
 import com.bonnjalal.wikiindaba.data.online.online_entity.OrganizerOnlineEntity
@@ -36,7 +35,7 @@ constructor(private val firestore: FirebaseFirestore, private val auth: AccountS
         })
 
     override suspend fun updateAttendee(task: AttendeeOnlineEntity): Unit =
-        traceAsync(UPDATE_TASK_TRACE, cookie = 12) {
+        traceAsync(UPDATE_TASK_TRACE, cookie = 11) {
             firestore.collection(TASK_COLLECTION).document(task.id).set(task).await()
         }
 
@@ -55,13 +54,13 @@ constructor(private val firestore: FirebaseFirestore, private val auth: AccountS
 
 
     override suspend fun saveProgram(program: ProgramOnlineEntity): String =
-        traceAsync(SAVE_TASK_TRACE, cookie = 10, block = {
+        traceAsync(SAVE_TASK_TRACE, cookie = 20, block = {
             val taskWithUserId = program.copy(id = auth.currentUserId)
             firestore.collection(TASK_COLLECTION).add(taskWithUserId).await().id
         })
 
     override suspend fun updateProgram(program: ProgramOnlineEntity): Unit =
-        traceAsync(UPDATE_TASK_TRACE, cookie = 12) {
+        traceAsync(UPDATE_TASK_TRACE, cookie = 21) {
             firestore.collection(TASK_COLLECTION).document(task.id).set(task).await()
         }
 
@@ -79,13 +78,13 @@ constructor(private val firestore: FirebaseFirestore, private val auth: AccountS
         firestore.collection(TASK_COLLECTION).document(id).get().await().toObject(OrganizerOnlineEntity::class.java)
 
     override suspend fun saveOrganizer(organizer: OrganizerOnlineEntity): String =
-        traceAsync(SAVE_TASK_TRACE, cookie = 10, block = {
+        traceAsync(SAVE_TASK_TRACE, cookie = 30, block = {
             val taskWithUserId = program.copy(id = auth.currentUserId)
             firestore.collection(TASK_COLLECTION).add(taskWithUserId).await().id
         })
 
     override suspend fun updateOrganizer(organizer: OrganizerOnlineEntity): Unit =
-        traceAsync(UPDATE_TASK_TRACE, cookie = 12) {
+        traceAsync(UPDATE_TASK_TRACE, cookie = 31) {
             firestore.collection(TASK_COLLECTION).document(task.id).set(task).await()
         }
 
