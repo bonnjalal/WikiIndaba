@@ -5,6 +5,7 @@ import com.bonnjalal.wikiindaba.data.online.online_entity.ProgramOnlineEntity
 import com.bonnjalal.wikiindaba.data.online.online_entity.mapper.EntityOnlineMapper
 import com.bonnjalal.wikiindaba.presentation.model.Program
 import com.google.firebase.Timestamp
+import java.util.Date
 import javax.inject.Inject
 
 class ProgramCacheMapper @Inject constructor(): EntityOnlineMapper<ProgramCacheEntity, Program> {
@@ -21,8 +22,8 @@ class ProgramCacheMapper @Inject constructor(): EntityOnlineMapper<ProgramCacheE
             room = entity.room,
             responsible = entity.responsible,
             slide = entity.slide,
-            startTime = Timestamp(entity.startTime,0),
-            endTime = Timestamp(entity.endTime,0)
+            startTime = Date(entity.startTime * 1000),
+            endTime = Date(entity.endTime*1000)
         )
     }
 
@@ -34,8 +35,8 @@ class ProgramCacheMapper @Inject constructor(): EntityOnlineMapper<ProgramCacheE
             room = model.room,
             responsible = model.responsible,
             slide = model.slide,
-            startTime = model.startTime.seconds,
-            endTime = model.endTime.seconds
+            startTime = model.startTime.time/1000,
+            endTime = model.endTime.time/1000
         )
     }
 }

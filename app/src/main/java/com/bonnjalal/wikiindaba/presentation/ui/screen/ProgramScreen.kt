@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
@@ -27,6 +28,7 @@ import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -49,6 +51,7 @@ import com.bonnjalal.wikiindaba.R
 import com.bonnjalal.wikiindaba.common.PROGRAM_SCREEN
 import com.bonnjalal.wikiindaba.common.SCAN_QR_SCREEN
 import com.bonnjalal.wikiindaba.common.compose.CustomTextField
+import com.bonnjalal.wikiindaba.presentation.state.DataState
 import com.bonnjalal.wikiindaba.presentation.ui.MainViewModel
 import com.slaviboy.composeunits.dh
 import com.slaviboy.composeunits.dw
@@ -60,6 +63,8 @@ fun ProgramScreen(navigate: (String) -> Unit,logout:(String) -> Unit, vm: MainVi
 
     val uiState by vm.searchProgramState
     val userStateAnonymous by vm.userState.collectAsState(initial = true)
+    val programState = vm.dataStateProgram
+
 
     ConstraintLayout(modifier = Modifier
         .fillMaxSize()
@@ -115,7 +120,7 @@ fun ProgramScreen(navigate: (String) -> Unit,logout:(String) -> Unit, vm: MainVi
 //                Spacer(Modifier.fillMaxWidth(0.1f))
                 Text(
                     modifier = Modifier.align(Alignment.CenterVertically),
-                    text = "Hello, Zakaria ",
+                    text = "Hello, There",
                     style = TextStyle(
                         fontSize = 0.025.sh,
 //                        lineHeight = 17.sp,
@@ -153,7 +158,22 @@ fun ProgramScreen(navigate: (String) -> Unit,logout:(String) -> Unit, vm: MainVi
 //                }
 
                 // Add 5 items
-                items(10) { index ->
+
+                items((programState.value as DataState.Success).data){ program ->
+                    val time = vm.getDateTime(program.startTime, program.endTime)
+                    ProgramCard(modifier = Modifier
+                        .fillMaxWidth(0.85f)
+                        .align(Alignment.CenterHorizontally)
+                        .clickable {
+                            if (!userStateAnonymous) navigate(SCAN_QR_SCREEN)
+                        },
+                        title = program.title,
+                        room = program.room,
+                        time = time,
+                        authors = program.authors)
+                    Spacer(Modifier.height(0.01.dh))
+                }
+                /*items(10) {
                     ProgramCard(modifier = Modifier
                         .fillMaxWidth(0.85f)
                         .align(Alignment.CenterHorizontally)
@@ -162,7 +182,7 @@ fun ProgramScreen(navigate: (String) -> Unit,logout:(String) -> Unit, vm: MainVi
                         })
                     Spacer(Modifier.height(0.01.dh))
 
-                }
+                }*/
 
                 // Add another single item
 //                item {
@@ -217,14 +237,14 @@ fun SearchField(value: String,  onNewValue: (String) -> Unit, modifier: Modifier
 }
 
 @Composable
-fun ProgramCard(modifier: Modifier){
+fun ProgramCard(modifier: Modifier, title:String, authors:String, room:String, time:String){
     Column (modifier = modifier
 //        .padding(horizontal = 8.dp)
         .background(color = Color(0xFFF5EEDF), shape = RoundedCornerShape(size = 0.012.dh)) ) {
 
         Text(
             modifier = Modifier.padding(start = 0.03.dw, top = 8.dp, end = 0.03.dw),
-            text = "How to become an administrator on the English Wikipedia",
+            text = title,
             style = TextStyle(
                 fontSize = 0.016.sh,
 //                lineHeight = 17.sp,
@@ -235,7 +255,7 @@ fun ProgramCard(modifier: Modifier){
         )
         Text(
             modifier = Modifier.padding(start = 0.03.dw, top = 0.004.dh, end = 0.03.dw),
-            text = "WereSpielChequers",
+            text = authors,
             style = TextStyle(
                 fontSize = 0.013.sh,
 //                lineHeight = 17.sp,
@@ -252,7 +272,7 @@ fun ProgramCard(modifier: Modifier){
                 tint =Color(0xFFA1A1A1) )
             Text(
                 modifier = Modifier.padding(horizontal = 0.016.dw),
-                text = "Room 2",
+                text = room,
                 style = TextStyle(
                     fontSize = 0.011.sh,
 //                    lineHeight = 17.sp,
@@ -269,7 +289,7 @@ fun ProgramCard(modifier: Modifier){
                 tint = Color(0xFFA1A1A1))
             Text(
                 modifier = Modifier.padding(horizontal = 0.016.dw),
-                text = "22 Nov, 13:00 - 13:30",
+                text = time,
                 style = TextStyle(
                     fontSize = 0.011.sh,
 //                    lineHeight = 17.sp,

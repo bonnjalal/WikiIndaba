@@ -18,10 +18,15 @@ import com.bonnjalal.wikiindaba.data.online.service.AccountService
 import com.bonnjalal.wikiindaba.presentation.state.DataState
 import com.bonnjalal.wikiindaba.presentation.state.LoginUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 import javax.inject.Inject
 import com.bonnjalal.wikiindaba.R.string as AppText
 
@@ -83,6 +88,7 @@ class MainViewModel
         }
         SnackbarManager.showMessage(AppText.anonymous_login_success)
         navigateAndPopup(PROGRAM_SCREEN, LOGIN_SCREEN)
+        setStateEvent(MainStateEvent.GetProgramEvent)
     }
 
     fun onSignOut (clearAndPopUp: (String) -> Unit){
@@ -128,8 +134,12 @@ class MainViewModel
     val dataStateOrganizer : LiveData<DataState<List<Organizer>>>
         get() = _dataStateOrganizer
 
-    private val _dataStateProgram : MutableLiveData<DataState<List<Program>>> = MutableLiveData()
-    val dataStateProgram : LiveData<DataState<List<Program>>>
+//    private val _dataStateProgram : MutableLiveData<DataState<List<Program>>> = MutableLiveData()
+//    val dataStateProgram : LiveData<DataState<List<Program>>>
+//        get() = _dataStateProgram
+
+    private val _dataStateProgram : MutableStateFlow<DataState<List<Program>>> = MutableStateFlow(DataState.Loading)
+    val dataStateProgram : StateFlow<DataState<List<Program>>>
         get() = _dataStateProgram
 
     fun setStateEvent(mainStateEvent: MainStateEvent) {
@@ -163,6 +173,21 @@ class MainViewModel
             }
         }
     }
+
+    fun getDateTime(startTime: Date, endTime:Date): String {
+        val maLocal = Locale.forLanguageTag("ar-MA")
+        return try {
+            val dateF = SimpleDateFormat("MMM-dd", maLocal)
+            val timeF = SimpleDateFormat("hh:mm", maLocal)
+    //            val startTime = Date(startTimestamp * 1000)
+    //            val endTime = Date(endTimestamp * 1000)
+
+            dateF.format(startTime)+ ", " + timeF.format(startTime) + " - " + timeF.format(endTime)
+        } catch (e: Exception) {
+            e.toString()
+        }
+    }
+
 
 }
 
