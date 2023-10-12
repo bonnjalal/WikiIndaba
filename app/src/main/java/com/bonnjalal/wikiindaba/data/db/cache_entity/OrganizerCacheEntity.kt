@@ -7,9 +7,9 @@ import androidx.room.PrimaryKey
 @Entity(tableName = "organizers")
 data class OrganizerCacheEntity(
 
-    @PrimaryKey(autoGenerate = true)
+    @PrimaryKey(autoGenerate = false)
     @ColumnInfo(name = "id")
-    var id: Int,
+    var id: String,
 
     @ColumnInfo(name = "name")
     var name: String,

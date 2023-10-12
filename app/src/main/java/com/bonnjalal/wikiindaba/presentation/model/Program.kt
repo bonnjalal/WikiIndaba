@@ -1,12 +1,14 @@
 package com.bonnjalal.wikiindaba.presentation.model
 
+import com.google.firebase.Timestamp
+
 data class Program(
-    var id: Int,
+    var id: String,
     var title: String,
-    var authors: List<String>,
-    var date: Double,
-    var time: Double,
-    var hallNumber: String,
-    var hallResponsible: String,
-    var respImage: String
+    var authors: String,
+    var startTime: Timestamp,
+    var endTime: Timestamp,
+    var room: String,
+    var responsible: String,
+    var slide: String
 )

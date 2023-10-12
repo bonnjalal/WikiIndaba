@@ -8,6 +8,7 @@ import com.bonnjalal.wikiindaba.data.online.service.AccountService
 import com.bonnjalal.wikiindaba.data.online.service.StorageService
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ktx.dataObjects
+import com.google.firebase.firestore.ktx.toObject
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.tasks.await
@@ -20,82 +21,110 @@ constructor(private val firestore: FirebaseFirestore, private val auth: AccountS
 
     override val attendees: Flow<List<AttendeeOnlineEntity>>
         get() =
-            auth.currentUser.flatMapLatest { user ->
-                firestore.collection(TASK_COLLECTION).whereEqualTo(USER_ID_FIELD, user.id).dataObjects()
-            }
+            firestore.collection(ATTENDEE_COLLECTION).dataObjects()
+//            auth.currentUser.flatMapLatest { user ->
+//                firestore.collection(ATTENDEE_COLLECTION).whereEqualTo(USER_ID_FIELD, user.id).dataObjects()
+//            }
 
     override suspend fun getAttendee(id: String): AttendeeOnlineEntity? =
-        firestore.collection(TASK_COLLECTION).document(id).get().await().toObject(AttendeeOnlineEntity::class.java)
+        firestore.collection(ATTENDEE_COLLECTION).document(id).get().await().toObject<AttendeeOnlineEntity?>()//?.copy(id = id)
+
+    override suspend fun saveAttendee(attendee: AttendeeOnlineEntity): String {
+        TODO("Not yet implemented")
+    }
 
 
-    override suspend fun saveAttendee(attendee: AttendeeOnlineEntity): String =
-        traceAsync(SAVE_TASK_TRACE, cookie = 10, block = {
-            val taskWithUserId = attendee.copy(id = auth.currentUserId)
-            firestore.collection(TASK_COLLECTION).add(taskWithUserId).await().id
-        })
+    /* override suspend fun saveAttendee(attendee: AttendeeOnlineEntity): String =
+         traceAsync(SAVE_ATTENDEE_TRACE, cookie = 10, block = {
+             // we don't add users from here, you should use google sheet or firebase console
+             val taskWithUserId = attendee.copy(id = "attendeeID_" + (collectionLenth + 1))
+             firestore.collection(ATTENDEE_COLLECTION).add(taskWithUserId).await().id
+         })*/
 
-    override suspend fun updateAttendee(task: AttendeeOnlineEntity): Unit =
-        traceAsync(UPDATE_TASK_TRACE, cookie = 11) {
-            firestore.collection(TASK_COLLECTION).document(task.id).set(task).await()
+    override suspend fun updateAttendee(attendee: AttendeeOnlineEntity): Unit =
+        traceAsync(UPDATE_ATTENDEE_TRACE, cookie = 11) {
+            firestore.collection(ATTENDEE_COLLECTION).document(attendee.id).set(attendee).await()
         }
 
     override suspend fun deleteAttendee(id: String) {
-        firestore.collection(TASK_COLLECTION).document(id).delete().await()
+        firestore.collection(ATTENDEE_COLLECTION).document(id).delete().await()
     }
 
     override val programs: Flow<List<ProgramOnlineEntity>>
         get() =
-            auth.currentUser.flatMapLatest { user ->
-                firestore.collection(TASK_COLLECTION).whereEqualTo(USER_ID_FIELD, user.id).dataObjects()
-            }
+            firestore.collection(PROGRAM_COLLECTION).dataObjects()
+//            auth.currentUser.flatMapLatest { user ->
+//                firestore.collection(PROGRAM_COLLECTION).whereEqualTo(USER_ID_FIELD, user.id).dataObjects()
+//            }
 
     override suspend fun getProgram(id: String): ProgramOnlineEntity? =
-        firestore.collection(TASK_COLLECTION).document(id).get().await().toObject(ProgramOnlineEntity::class.java)
+        firestore.collection(PROGRAM_COLLECTION).document(id).get().await().toObject(ProgramOnlineEntity::class.java)
+
+    override suspend fun saveProgram(program: ProgramOnlineEntity): String {
+        TODO("Not yet implemented")
+    }
 
 
-    override suspend fun saveProgram(program: ProgramOnlineEntity): String =
-        traceAsync(SAVE_TASK_TRACE, cookie = 20, block = {
-            val taskWithUserId = program.copy(id = auth.currentUserId)
-            firestore.collection(TASK_COLLECTION).add(taskWithUserId).await().id
-        })
+    /*override suspend fun saveProgram(program: ProgramOnlineEntity): String =
+        traceAsync(SAVE_PROGRAM_TRACE, cookie = 20, block = {
+            // we don't add users from here, you should use google sheet or firebase console
+            val taskWithUserId = program.copy(id = "programID_" + (collectionLenth + 1))
+            firestore.collection(PROGRAM_COLLECTION).add(taskWithUserId).await().id
+        })*/
 
     override suspend fun updateProgram(program: ProgramOnlineEntity): Unit =
-        traceAsync(UPDATE_TASK_TRACE, cookie = 21) {
-            firestore.collection(TASK_COLLECTION).document(task.id).set(task).await()
+        traceAsync(UPDATE_PROGRAM_TRACE, cookie = 21) {
+            firestore.collection(PROGRAM_COLLECTION).document(program.id).set(program).await()
         }
 
     override suspend fun deleteProgram(id: String) {
-        firestore.collection(TASK_COLLECTION).document(id).delete().await()
+        firestore.collection(PROGRAM_COLLECTION).document(id).delete().await()
     }
 
     override val organizers: Flow<List<OrganizerOnlineEntity>>
         get() =
-            auth.currentUser.flatMapLatest { user ->
-                firestore.collection(TASK_COLLECTION).whereEqualTo(USER_ID_FIELD, user.id).dataObjects()
-            }
+            firestore.collection(ATTENDEE_COLLECTION).whereEqualTo(ROLE_FIELD, ROLE_VALUE).dataObjects()
+//            auth.currentUser.flatMapLatest { user ->
+//                firestore.collection(ATTENDEE_COLLECTION).whereEqualTo(USER_ID_FIELD, user.id).dataObjects()
+//            }
 
     override suspend fun getOrganizer(id: String): OrganizerOnlineEntity? =
-        firestore.collection(TASK_COLLECTION).document(id).get().await().toObject(OrganizerOnlineEntity::class.java)
+        firestore.collection(ATTENDEE_COLLECTION).document(id).get().await().toObject(OrganizerOnlineEntity::class.java)
 
-    override suspend fun saveOrganizer(organizer: OrganizerOnlineEntity): String =
-        traceAsync(SAVE_TASK_TRACE, cookie = 30, block = {
-            val taskWithUserId = program.copy(id = auth.currentUserId)
-            firestore.collection(TASK_COLLECTION).add(taskWithUserId).await().id
-        })
+    override suspend fun saveOrganizer(organizer: OrganizerOnlineEntity): String {
+        TODO("Not yet implemented")
+    }
+
+    /*override suspend fun saveOrganizer(organizer: OrganizerOnlineEntity): String =
+        traceAsync(SAVE_ATTENDEE_TRACE, cookie = 30, block = {
+            // we don't add users from here, you should use google sheet or firebase console
+            val taskWithUserId = organizer.copy(id = "attendeeID_" + (collectionLenth + 1))
+            firestore.collection(ATTENDEE_COLLECTION).add(taskWithUserId).await().id
+        })*/
 
     override suspend fun updateOrganizer(organizer: OrganizerOnlineEntity): Unit =
-        traceAsync(UPDATE_TASK_TRACE, cookie = 31) {
-            firestore.collection(TASK_COLLECTION).document(task.id).set(task).await()
+        traceAsync(UPDATE_ATTENDEE_TRACE, cookie = 31) {
+            firestore.collection(ATTENDEE_COLLECTION).document(organizer.id).set(organizer).await()
         }
 
     override suspend fun deleteOrganizer(id: String) {
-        firestore.collection(TASK_COLLECTION).document(id).delete().await()
+        firestore.collection(ATTENDEE_COLLECTION).document(id).delete().await()
     }
 
     companion object {
         private const val USER_ID_FIELD = "userId"
-        private const val TASK_COLLECTION = "tasks"
-        private const val SAVE_TASK_TRACE = "saveTask"
-        private const val UPDATE_TASK_TRACE = "updateTask"
+
+        private const val ATTENDEE_COLLECTION = "attendees"
+        private const val SAVE_ATTENDEE_TRACE = "saveAttendee"
+        private const val UPDATE_ATTENDEE_TRACE = "updateAttendee"
+
+        private const val PROGRAM_COLLECTION = "programs"
+        private const val SAVE_PROGRAM_TRACE = "saveProgram"
+        private const val UPDATE_PROGRAM_TRACE = "updateProgram"
+
+        // For Organizers
+        private const val ROLE_FIELD = "role"
+        private const val ROLE_VALUE = "Core Team organizer"
+
     }
 }

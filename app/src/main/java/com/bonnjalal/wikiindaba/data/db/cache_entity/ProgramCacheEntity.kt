@@ -7,9 +7,9 @@ import androidx.room.PrimaryKey
 @Entity(tableName = "program")
 data class ProgramCacheEntity(
 
-    @PrimaryKey(autoGenerate = true)
+    @PrimaryKey(autoGenerate = false)
     @ColumnInfo(name = "id")
-    var id: Int,
+    var id: String,
 
     @ColumnInfo(name = "title")
     var title: String,
@@ -17,18 +17,18 @@ data class ProgramCacheEntity(
     @ColumnInfo(name = "authors")
     var authors: String,
 
-    @ColumnInfo(name = "date")
-    var date: Double,
+    @ColumnInfo(name = "start_time")
+    var startTime: Long,
 
-    @ColumnInfo("time")
-    var time: Double,
+    @ColumnInfo("end_time")
+    var endTime: Long,
 
-    @ColumnInfo(name = "hallN")
-    var hallNumber: String,
+    @ColumnInfo(name = "room")
+    var room: String,
 
-    @ColumnInfo(name = "hall_responsible")
-    var hallResponsible: String,
+    @ColumnInfo(name = "responsible")
+    var responsible: String,
 
-    @ColumnInfo(name = "resp_image")
-    var respImage: String
+    @ColumnInfo(name = "slide")
+    var slide: String
 )

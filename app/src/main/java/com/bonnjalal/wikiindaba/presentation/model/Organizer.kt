@@ -1,7 +1,7 @@
 package com.bonnjalal.wikiindaba.presentation.model
 
 data class Organizer(
-    var id: Int,
+    var id: String,
     var name: String,
     var username: String,
     var room: String,

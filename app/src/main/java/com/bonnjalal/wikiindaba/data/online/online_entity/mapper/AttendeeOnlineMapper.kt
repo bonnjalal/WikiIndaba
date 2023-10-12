@@ -8,11 +8,30 @@ import javax.inject.Inject
 class AttendeeOnlineMapper @Inject constructor():
     EntityOnlineMapper<AttendeeOnlineEntity, AttendeeCacheEntity> {
     override fun mapFromEntity(entity: AttendeeOnlineEntity): AttendeeCacheEntity {
-        TODO("Not yet implemented")
+        return AttendeeCacheEntity(
+            id = entity.id,
+            name = entity.name,
+            room = entity.room,
+            role = entity.role,
+            username = entity.username,
+            phoneNumber = entity.phone,
+            email = entity.email,
+            imgUrl = entity.imgUrl
+
+        )
     }
 
     override fun mapToEntity(model: AttendeeCacheEntity): AttendeeOnlineEntity {
-        TODO("Not yet implemented")
+        return AttendeeOnlineEntity(
+            id = model.id,
+            name = model.name,
+            room = model.room,
+            role = model.role,
+            username = model.username,
+            phone = model.phoneNumber,
+            email = model.email,
+            imgUrl = model.imgUrl
+        )
     }
 
     fun mapFromEntityList(entities: List<AttendeeOnlineEntity>): List<AttendeeCacheEntity> {

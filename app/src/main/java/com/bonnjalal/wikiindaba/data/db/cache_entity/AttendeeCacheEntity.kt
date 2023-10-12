@@ -7,18 +7,18 @@ import androidx.room.PrimaryKey
 @Entity(tableName = "attendees")
 data class AttendeeCacheEntity(
 
-    @PrimaryKey(autoGenerate = true)
+    @PrimaryKey(autoGenerate = false)
     @ColumnInfo(name = "id")
-    var id: Int,
+    var id: String,
 
     @ColumnInfo(name = "name")
     var name: String,
 
-    @ColumnInfo(name = "affiliate")
-    var affiliate: String,
+    @ColumnInfo(name = "email")
+    var email: String,
 
-    @ColumnInfo(name = "position")
-    var position: String,
+    @ColumnInfo(name = "role")
+    var role: String,
 
     @ColumnInfo(name = "username")
     var username: String,
@@ -27,5 +27,8 @@ data class AttendeeCacheEntity(
     var room: String,
 
     @ColumnInfo(name = "phone")
-    var phoneNumber: String
+    var phoneNumber: String,
+
+    @ColumnInfo(name = "image_url")
+    var imgUrl: String
 )
