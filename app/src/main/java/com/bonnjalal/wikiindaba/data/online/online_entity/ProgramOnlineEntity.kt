@@ -1,16 +1,22 @@
 package com.bonnjalal.wikiindaba.data.online.online_entity
 
 import com.google.firebase.Timestamp
+import com.google.firebase.firestore.DocumentId
 
 data class ProgramOnlineEntity(
 
-    var id: String,
-    var title: String,
-    var authors: String,
+    @DocumentId var id: String = "",
+    var title: String = "",
+    var authors: String =  "",
 //    var date: Double,
-    var startTime: Timestamp,
-    var endTime: Timestamp,
-    var room: String,
-    var responsible: String,
-    var slide: String
+//    @get:PropertyName("startTime")
+//    @set:PropertyName("startTime")
+    var startDate: Timestamp = Timestamp.now(),
+//    @get:PropertyName("endTime")
+//    @set:PropertyName("endTime")
+    var endDate: Timestamp = Timestamp.now(),
+    var room: String = "",
+    var responsible: String = "",
+    var slide: String = ""
 )
+

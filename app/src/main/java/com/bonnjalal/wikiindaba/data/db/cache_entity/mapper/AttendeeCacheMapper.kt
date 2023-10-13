@@ -16,7 +16,8 @@ class AttendeeCacheMapper @Inject constructor():
             email = entity.email,
             role = entity.role,
             phoneNumber = entity.phoneNumber,
-            room = entity.room
+            room = entity.room,
+            imgUrl = entity.imgUrl
         )
     }
 
@@ -28,7 +29,8 @@ class AttendeeCacheMapper @Inject constructor():
             email = model.email,
             role = model.role,
             phoneNumber = model.phoneNumber,
-            room = model.room
+            room = model.room,
+            imgUrl = model.imgUrl
         )
     }
 

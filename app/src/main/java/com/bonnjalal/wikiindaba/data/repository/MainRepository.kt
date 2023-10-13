@@ -1,5 +1,6 @@
 package com.bonnjalal.wikiindaba.data.repository
 
+import android.util.Log
 import com.bonnjalal.wikiindaba.data.db.cache_entity.mapper.AttendeeCacheMapper
 import com.bonnjalal.wikiindaba.data.db.cache_entity.mapper.OrganizerCacheMapper
 import com.bonnjalal.wikiindaba.data.db.cache_entity.mapper.ProgramCacheMapper
@@ -17,6 +18,8 @@ import com.bonnjalal.wikiindaba.presentation.state.DataState
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.coroutineContext
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flow
 
 class MainRepository
@@ -64,14 +67,25 @@ constructor(
 
     }
     suspend fun getProgram() : Flow<DataState<List<Program>>> = flow {
+        Log.e("indaba Repository", "before loading")
         emit(DataState.Loading)
+//        Log.e("indaba Repository", "After loading")
+//        val prog = storageService.getProgram("programID_1")
+//        Log.e("indaba Repository", "cellect" + prog.toString())
+
+
         try {
-            storageService.programs.collectLatest {
-                programDao.insert(programOnlineMapper.mapFromEntityList(it))
-            }
+            val onlinePrograms = storageService.programs.first()
+//            Log.e("indaba Repository", "cellect " + onlinePrograms.toString())
+            val result = programDao.insert(programOnlineMapper.mapFromEntityList(onlinePrograms))
+//            Log.e("indaba Repository", "aflet collect $result")
             val cachedProgram = programDao.get()
+//            Log.e("indaba Repository", "program: $cachedProgram")
             val program = programCacheMapper.mapFromEntityList(cachedProgram)
+//            Log.e("indaba Repository", "program: $program")
+
             emit(DataState.Success(program))
+            Log.e("indaba Repository", "After emit program")
         }catch (e:Exception) {
             emit(DataState.Error(e))
         }

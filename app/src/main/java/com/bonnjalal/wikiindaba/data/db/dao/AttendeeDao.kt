@@ -13,7 +13,7 @@ interface AttendeeDao {
     suspend fun insert (attendeeEntity: AttendeeCacheEntity): Long
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insert (attendeeEntity: List<AttendeeCacheEntity>): Long
+    suspend fun insert (attendeeEntity: List<AttendeeCacheEntity>)
 
     @Query(value="SELECT * FROM attendees")
     suspend fun get(): List<AttendeeCacheEntity>

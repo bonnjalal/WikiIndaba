@@ -23,6 +23,7 @@ import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -32,12 +33,13 @@ import com.bonnjalal.wikiindaba.common.PROGRAM_SCREEN
 import com.bonnjalal.wikiindaba.common.SCAN_QR_SCREEN
 import com.bonnjalal.wikiindaba.common.snackbar.SnackbarManager
 import com.bonnjalal.wikiindaba.presentation.state.IndabaAppState
+import com.bonnjalal.wikiindaba.presentation.ui.MainViewModel
 import kotlinx.coroutines.CoroutineScope
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun IndabaScreen() {
+fun IndabaScreen(vm:MainViewModel = hiltViewModel()) {
 //    val navController = rememberNavController()
 
 
@@ -65,14 +67,18 @@ fun IndabaScreen() {
                 ) {
                 // Screen content
                 NavHost(navController = appState.navController, startDestination = LOGIN_SCREEN) {
-                    composable(LOGIN_SCREEN) { LoginScreen(navigateAndPopup = { route, popup -> appState.navigateAndPopUp(route, popup) }) }
+                    composable(LOGIN_SCREEN) { LoginScreen(
+                        vm = vm,
+                        navigateAndPopup = { route, popup -> appState.navigateAndPopUp(route, popup) }) }
                     composable(PROGRAM_SCREEN) {
                         ProgramScreen(
+                            vm = vm,
                             navigate = { route -> appState.navigate(route) },
                             logout = {route -> appState.clearAndNavigate(route)})
                     }
                     composable(SCAN_QR_SCREEN) {
                         ScanQrScreen(
+                            vm = vm,
                             openAndPopUp = { route, popUp -> appState.navigateAndPopUp(route, popUp) },
                             popup = { -> appState.popUp()}
                         )
@@ -85,7 +91,7 @@ fun IndabaScreen() {
 
 }
 
-@JvmOverloads
+//@JvmOverloads
 @Composable
 fun rememberAppState(
     snackbarHostState: SnackbarHostState = remember { SnackbarHostState() },
@@ -104,8 +110,8 @@ fun resources(): Resources {
     LocalConfiguration.current
     return LocalContext.current.resources
 }
-@Preview
-@Composable
-fun previewIndabaScreen(){
-    IndabaScreen()
-}
+//@Preview
+//@Composable
+//fun previewIndabaScreen(){
+//    IndabaScreen()
+//}

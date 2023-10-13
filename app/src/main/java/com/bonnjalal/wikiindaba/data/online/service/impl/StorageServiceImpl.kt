@@ -53,12 +53,13 @@ constructor(private val firestore: FirebaseFirestore, private val auth: AccountS
     override val programs: Flow<List<ProgramOnlineEntity>>
         get() =
             firestore.collection(PROGRAM_COLLECTION).dataObjects()
+
 //            auth.currentUser.flatMapLatest { user ->
 //                firestore.collection(PROGRAM_COLLECTION).whereEqualTo(USER_ID_FIELD, user.id).dataObjects()
 //            }
 
     override suspend fun getProgram(id: String): ProgramOnlineEntity? =
-        firestore.collection(PROGRAM_COLLECTION).document(id).get().await().toObject(ProgramOnlineEntity::class.java)
+        firestore.collection(PROGRAM_COLLECTION).document(id).get().await().toObject()//?.copy(id = id)
 
     override suspend fun saveProgram(program: ProgramOnlineEntity): String {
         TODO("Not yet implemented")

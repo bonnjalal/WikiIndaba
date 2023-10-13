@@ -1,5 +1,6 @@
 package com.bonnjalal.wikiindaba.presentation.ui.screen
 
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -17,6 +18,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -25,10 +27,8 @@ import androidx.compose.material3.Shapes
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.*
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -47,6 +47,7 @@ import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.bonnjalal.wikiindaba.R
 import com.bonnjalal.wikiindaba.common.PROGRAM_SCREEN
 import com.bonnjalal.wikiindaba.common.SCAN_QR_SCREEN
@@ -62,10 +63,27 @@ import com.slaviboy.composeunits.sh
 fun ProgramScreen(navigate: (String) -> Unit,logout:(String) -> Unit, vm: MainViewModel = hiltViewModel()){
 
     val uiState by vm.searchProgramState
-    val userStateAnonymous by vm.userState.collectAsState(initial = true)
-    val programState = vm.dataStateProgram
+    val userStateAnonymous by vm.userState.collectAsStateWithLifecycle(initialValue = false)
+    val programState by vm.dataStateProgram.collectAsStateWithLifecycle()
+    var showPrograms by remember {vm.showPrograms}
 
+//    var showPrograms by remember { mutableStateOf(false) }
+//    var showLoadingBar by remember { mutableStateOf(true) }
 
+    Log.e("indaba ViewModel", "dataState success show: ${vm.showPrograms}")
+    LaunchedEffect(key1 = programState, block = {
+        showPrograms = when (programState) {
+            is DataState.Success -> {
+                true
+            }
+            is DataState.Error -> {
+                false
+            }
+            is DataState.Loading -> {
+                false
+            }
+        }
+    } )
     ConstraintLayout(modifier = Modifier
         .fillMaxSize()
         .background(color = Color(0xFFA39274))) {
@@ -151,44 +169,59 @@ fun ProgramScreen(navigate: (String) -> Unit,logout:(String) -> Unit, vm: MainVi
                     .align(Alignment.CenterHorizontally))
 
             Spacer(Modifier.height(0.03.dh))
-            LazyColumn (modifier = Modifier.align(Alignment.CenterHorizontally)){
-                // Add a single item
+
+            if (showPrograms) {
+                LazyColumn(modifier = Modifier.align(Alignment.CenterHorizontally)) {
+                    // Add a single item
 //                item {
 //                    Text(text = "First item")
 //                }
 
-                // Add 5 items
+                    // Add 5 items
 
-                items((programState.value as DataState.Success).data){ program ->
-                    val time = vm.getDateTime(program.startTime, program.endTime)
-                    ProgramCard(modifier = Modifier
-                        .fillMaxWidth(0.85f)
-                        .align(Alignment.CenterHorizontally)
-                        .clickable {
-                            if (!userStateAnonymous) navigate(SCAN_QR_SCREEN)
-                        },
-                        title = program.title,
-                        room = program.room,
-                        time = time,
-                        authors = program.authors)
-                    Spacer(Modifier.height(0.01.dh))
-                }
-                /*items(10) {
-                    ProgramCard(modifier = Modifier
-                        .fillMaxWidth(0.85f)
-                        .align(Alignment.CenterHorizontally)
-                        .clickable {
-                            if (!userStateAnonymous) navigate(SCAN_QR_SCREEN)
-                        })
-                    Spacer(Modifier.height(0.01.dh))
+                    items((vm.dataStateProgram.value as DataState.Success).data) { program ->
+                        val time = vm.getDateTime(program.startTime, program.endTime)
+                        ProgramCard(
+                            modifier = Modifier
+                                .fillMaxWidth(0.85f)
+                                .align(Alignment.CenterHorizontally)
+                                .clickable {
+                                    if (!userStateAnonymous) navigate(SCAN_QR_SCREEN)
+                                },
+                            title = program.title,
+                            room = program.room,
+                            time = time,
+                            authors = program.authors
+                        )
+                        Spacer(Modifier.height(0.01.dh))
+                    }
+                    /*items(10) {
+                        ProgramCard(modifier = Modifier
+                            .fillMaxWidth(0.85f)
+                            .align(Alignment.CenterHorizontally)
+                            .clickable {
+                                if (!userStateAnonymous) navigate(SCAN_QR_SCREEN)
+                            })
+                        Spacer(Modifier.height(0.01.dh))
 
-                }*/
+                    }*/
 
-                // Add another single item
+                    // Add another single item
 //                item {
 //                    Text(text = "Last item")
 //                }
+                }
+            }else {
+                Column (modifier = Modifier.align(Alignment.CenterHorizontally)){
+                    CircularProgressIndicator(modifier = Modifier.align(Alignment.CenterHorizontally),
+                        color = Color(0xFFF5EEDF))
+                    Text(modifier = Modifier.align(Alignment.CenterHorizontally),
+                        text = "Loading programs ...", color = Color(0xFF531B1C),
+                        fontSize = 0.013.sh)
+                }
+
             }
+
         }
 
     }
@@ -301,8 +334,8 @@ fun ProgramCard(modifier: Modifier, title:String, authors:String, room:String, t
         }
     }
 }
-@Preview
-@Composable
-fun PreviewProgamScreen(){
-    ProgramScreen({ str1 -> },{})
-}
+//@Preview
+//@Composable
+//fun PreviewProgamScreen(){
+//    ProgramScreen({ str1 -> },{})
+//}

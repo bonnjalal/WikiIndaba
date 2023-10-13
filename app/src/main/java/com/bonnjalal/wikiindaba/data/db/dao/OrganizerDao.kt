@@ -13,7 +13,7 @@ interface OrganizerDao {
     suspend fun insert (organizerEntity: OrganizerCacheEntity): Long
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insert (organizerEntity: List<OrganizerCacheEntity>): Long
+    suspend fun insert (organizerEntity: List<OrganizerCacheEntity>)
 
     @Query(value="SELECT * FROM organizers")
     suspend fun get(): List<OrganizerCacheEntity>

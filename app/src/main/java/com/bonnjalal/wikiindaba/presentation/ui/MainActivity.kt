@@ -23,7 +23,7 @@ import dagger.hilt.android.AndroidEntryPoint
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
 
-    val viewModel: MainViewModel by viewModels()
+//    val viewModel: MainViewModel by viewModels()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         initSize()
@@ -36,10 +36,10 @@ class MainActivity : ComponentActivity() {
     }
 }
 
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    WikiIndabaTheme {
-       Test(context = Activity(),name = "Zakaria", number = 2)
-    }
-}
+//@Preview(showBackground = true)
+//@Composable
+//fun GreetingPreview() {
+//    WikiIndabaTheme {
+//       Test(context = Activity(),name = "Zakaria", number = 2)
+//    }
+//}

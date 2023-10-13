@@ -20,8 +20,8 @@ class ProgramOnlineMapper @Inject constructor():
             room = entity.room,
             responsible = entity.responsible,
             slide = entity.slide,
-            startTime = entity.startTime.seconds,
-            endTime = entity.endTime.seconds
+            startTime = entity.startDate.seconds,
+            endTime = entity.endDate.seconds
         )
     }
 
@@ -33,8 +33,8 @@ class ProgramOnlineMapper @Inject constructor():
             room = model.room,
             responsible = model.responsible,
             slide = model.slide,
-            startTime = Timestamp(model.startTime, 0),
-            endTime = Timestamp(model.endTime,0)
+            startDate = Timestamp(model.startTime, 0),
+            endDate = Timestamp(model.endTime,0)
         )
     }
 }
