@@ -219,11 +219,8 @@ fun ProgramScreen(navigate: (String) -> Unit,logout:(String) -> Unit, vm: MainVi
                         text = "Loading programs ...", color = Color(0xFF531B1C),
                         fontSize = 0.013.sh)
                 }
-
             }
-
         }
-
     }
 }
 

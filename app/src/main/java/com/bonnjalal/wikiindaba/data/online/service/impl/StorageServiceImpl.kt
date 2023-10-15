@@ -1,6 +1,7 @@
 package com.bonnjalal.wikiindaba.data.online.service.impl;
 
 import androidx.tracing.traceAsync
+import com.bonnjalal.wikiindaba.data.online.online_entity.AttendanceOnlineEntity
 import com.bonnjalal.wikiindaba.data.online.online_entity.AttendeeOnlineEntity
 import com.bonnjalal.wikiindaba.data.online.online_entity.OrganizerOnlineEntity
 import com.bonnjalal.wikiindaba.data.online.online_entity.ProgramOnlineEntity
@@ -112,6 +113,25 @@ constructor(private val firestore: FirebaseFirestore, private val auth: AccountS
         firestore.collection(ATTENDEE_COLLECTION).document(id).delete().await()
     }
 
+
+    override suspend fun getAttendance(path: String): Flow<List<AttendanceOnlineEntity>> =
+        firestore.collection("$PROGRAM_COLLECTION/$path").dataObjects()
+
+    override suspend fun saveAttendance(path:String, attendance: AttendanceOnlineEntity): String =
+        traceAsync(SAVE_ATTENDANCE_TRACE, cookie = 40, block = {
+            firestore.collection("$PROGRAM_COLLECTION/$path").add(attendance).await().id
+        })
+
+    override suspend fun updateAttendance(path:String, attendance: AttendanceOnlineEntity) {
+        traceAsync(UPDATE_ATTENDANCE_TRACE, cookie = 41) {
+            firestore.collection("$PROGRAM_COLLECTION/$path").document(attendance.name).set(attendance).await()
+        }
+    }
+
+    override suspend fun deleteAttendance(path: String, name:String) {
+        firestore.collection("$PROGRAM_COLLECTION/$path").document(name).delete().await()
+    }
+
     companion object {
         private const val USER_ID_FIELD = "userId"
 
@@ -123,6 +143,8 @@ constructor(private val firestore: FirebaseFirestore, private val auth: AccountS
         private const val SAVE_PROGRAM_TRACE = "saveProgram"
         private const val UPDATE_PROGRAM_TRACE = "updateProgram"
 
+        private const val SAVE_ATTENDANCE_TRACE = "saveAttendance"
+        private const val UPDATE_ATTENDANCE_TRACE = "updateAttendance"
         // For Organizers
         private const val ROLE_FIELD = "role"
         private const val ROLE_VALUE = "Core Team organizer"

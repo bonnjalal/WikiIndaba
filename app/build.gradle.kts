@@ -119,6 +119,12 @@ dependencies {
     implementation("androidx.lifecycle:lifecycle-runtime-compose:2.6.2")
     implementation("androidx.compose.runtime:runtime-livedata:1.5.3")
 
+    implementation ("com.google.code.gson:gson:2.10.1")
+
+    // scan qr code
+    implementation ("com.google.android.gms:play-services-code-scanner:16.1.0")
+
+
 
 }
 

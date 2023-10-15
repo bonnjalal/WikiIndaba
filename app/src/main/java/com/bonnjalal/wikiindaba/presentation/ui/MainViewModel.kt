@@ -1,6 +1,8 @@
 package com.bonnjalal.wikiindaba.presentation.ui
 
+import android.content.Context
 import android.util.Log
+import androidx.compose.material3.Snackbar
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -14,6 +16,7 @@ import com.bonnjalal.wikiindaba.common.LOGIN_SCREEN
 import com.bonnjalal.wikiindaba.common.PROGRAM_SCREEN
 import com.bonnjalal.wikiindaba.common.ext.isValidEmail
 import com.bonnjalal.wikiindaba.common.snackbar.SnackbarManager
+import com.bonnjalal.wikiindaba.common.snackbar.SnackbarMessage
 import com.bonnjalal.wikiindaba.common.snackbar.SnackbarMessage.Companion.toSnackbarMessage
 import com.bonnjalal.wikiindaba.data.repository.MainRepository
 import com.bonnjalal.wikiindaba.presentation.model.Attendee
@@ -22,6 +25,9 @@ import com.bonnjalal.wikiindaba.presentation.model.Program
 import com.bonnjalal.wikiindaba.data.online.service.AccountService
 import com.bonnjalal.wikiindaba.presentation.state.DataState
 import com.bonnjalal.wikiindaba.presentation.state.LoginUiState
+import com.google.mlkit.vision.barcode.common.Barcode
+import com.google.mlkit.vision.codescanner.GmsBarcodeScannerOptions
+import com.google.mlkit.vision.codescanner.GmsBarcodeScanning
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineScope
@@ -240,6 +246,38 @@ class MainViewModel
         )
 
 
+    fun scanQrCode(context: Context){
+        val options = GmsBarcodeScannerOptions.Builder()
+            .setBarcodeFormats(
+                Barcode.FORMAT_QR_CODE,
+//                Barcode.FORMAT_AZTEC
+            )
+            .enableAutoZoom()
+            .build()
+        val scanner = GmsBarcodeScanning.getClient(context, options)
+
+        scanner.startScan()
+            .addOnSuccessListener { barcode ->
+                // Task completed successfully
+                barcode.displayValue?.let { SnackbarManager.showMessage(SnackbarMessage.StringSnackbar(it)) }
+
+
+                /**
+                 * More logic about cheking if the qr code is actually a wiki indaba qr code by
+                 * searching on the attendees list
+                 */
+
+            }
+            .addOnCanceledListener {
+                // Task canceled
+                SnackbarManager.showMessage(AppText.by_user_error)
+            }
+            .addOnFailureListener { e ->
+                // Task failed with an exception
+                e.message?.let { SnackbarManager.showMessage(SnackbarMessage.StringSnackbar(it)) }
+            }
+
+    }
 }
 
 

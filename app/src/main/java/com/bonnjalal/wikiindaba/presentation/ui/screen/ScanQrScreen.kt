@@ -20,11 +20,13 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.modifier.modifierLocalConsumer
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -33,6 +35,9 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.bonnjalal.wikiindaba.R
 import com.bonnjalal.wikiindaba.presentation.ui.MainViewModel
+import com.google.mlkit.vision.barcode.common.Barcode
+import com.google.mlkit.vision.codescanner.GmsBarcodeScannerOptions
+import com.google.mlkit.vision.codescanner.GmsBarcodeScanning
 import com.slaviboy.composeunits.dh
 import com.slaviboy.composeunits.dw
 import com.slaviboy.composeunits.sh
@@ -40,6 +45,18 @@ import com.slaviboy.composeunits.sh
 
 @Composable
 fun ScanQrScreen (openAndPopUp: (String, String) -> Unit,popup: () -> Unit, vm:MainViewModel = hiltViewModel()) {
+    /*val options = remember {
+        GmsBarcodeScannerOptions.Builder()
+            .setBarcodeFormats(
+                Barcode.FORMAT_QR_CODE,
+//                Barcode.FORMAT_AZTEC
+            )
+            .enableAutoZoom()
+            .build()
+    }
+    val scanner = GmsBarcodeScanning.getClient(LocalContext.current, options)*/
+
+    
     Column (modifier = Modifier
         .background(color = Color(0xFFFFFFFF))
         .fillMaxSize()) {
@@ -122,6 +139,7 @@ fun ScanQrScreen (openAndPopUp: (String, String) -> Unit,popup: () -> Unit, vm:M
         )
 
         Spacer(modifier = Modifier.height(0.03.dh))
+        val context = LocalContext.current
         Box (modifier = Modifier
             .height(0.05.dh)
             .fillMaxWidth(0.8f)
@@ -132,7 +150,7 @@ fun ScanQrScreen (openAndPopUp: (String, String) -> Unit,popup: () -> Unit, vm:M
                 shape = RoundedCornerShape(size = 0.01.dh)
             )
             .clickable {
-//                vm.onSignInClick()
+                       vm.scanQrCode(context)
             },
             contentAlignment = Alignment.Center) {
 
