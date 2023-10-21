@@ -114,22 +114,22 @@ constructor(private val firestore: FirebaseFirestore, private val auth: AccountS
     }
 
 
-    override suspend fun getAttendance(path: String): Flow<List<AttendanceOnlineEntity>> =
-        firestore.collection("$PROGRAM_COLLECTION/$path").dataObjects()
+    override suspend fun getAttendance(programId: String): Flow<List<AttendanceOnlineEntity>> =
+        firestore.collection("$PROGRAM_COLLECTION/$programId/attendance").dataObjects()
 
     override suspend fun saveAttendance(path:String, attendance: AttendanceOnlineEntity): String =
         traceAsync(SAVE_ATTENDANCE_TRACE, cookie = 40, block = {
             firestore.collection("$PROGRAM_COLLECTION/$path").add(attendance).await().id
         })
 
-    override suspend fun updateAttendance(path:String, attendance: AttendanceOnlineEntity) {
+    override suspend fun updateAttendance(programId:String, attendance: AttendanceOnlineEntity) {
         traceAsync(UPDATE_ATTENDANCE_TRACE, cookie = 41) {
-            firestore.collection("$PROGRAM_COLLECTION/$path").document(attendance.name).set(attendance).await()
+            firestore.collection("$PROGRAM_COLLECTION/$programId/attendance").document(attendance.name).set(attendance).await()
         }
     }
 
-    override suspend fun deleteAttendance(path: String, name:String) {
-        firestore.collection("$PROGRAM_COLLECTION/$path").document(name).delete().await()
+    override suspend fun deleteAttendance(programId: String, name:String) {
+        firestore.collection("$PROGRAM_COLLECTION/$programId/attendance").document(name).delete().await()
     }
 
     companion object {

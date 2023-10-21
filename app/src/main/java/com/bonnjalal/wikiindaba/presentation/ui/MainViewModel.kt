@@ -2,42 +2,38 @@ package com.bonnjalal.wikiindaba.presentation.ui
 
 import android.content.Context
 import android.util.Log
-import androidx.compose.material3.Snackbar
-import androidx.compose.runtime.getValue
+import androidx.compose.runtime.*
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.SavedStateHandleSaveableApi
+import com.bonnjalal.wikiindaba.R
 import com.bonnjalal.wikiindaba.common.LOGIN_SCREEN
 import com.bonnjalal.wikiindaba.common.PROGRAM_SCREEN
 import com.bonnjalal.wikiindaba.common.ext.isValidEmail
 import com.bonnjalal.wikiindaba.common.snackbar.SnackbarManager
-import com.bonnjalal.wikiindaba.common.snackbar.SnackbarMessage
 import com.bonnjalal.wikiindaba.common.snackbar.SnackbarMessage.Companion.toSnackbarMessage
+import com.bonnjalal.wikiindaba.data.online.service.AccountService
 import com.bonnjalal.wikiindaba.data.repository.MainRepository
+import com.bonnjalal.wikiindaba.presentation.model.Attendance
 import com.bonnjalal.wikiindaba.presentation.model.Attendee
 import com.bonnjalal.wikiindaba.presentation.model.Organizer
 import com.bonnjalal.wikiindaba.presentation.model.Program
-import com.bonnjalal.wikiindaba.data.online.service.AccountService
 import com.bonnjalal.wikiindaba.presentation.state.DataState
 import com.bonnjalal.wikiindaba.presentation.state.LoginUiState
-import com.google.mlkit.vision.barcode.common.Barcode
-import com.google.mlkit.vision.codescanner.GmsBarcodeScannerOptions
-import com.google.mlkit.vision.codescanner.GmsBarcodeScanning
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
+import java.security.AccessController.getContext
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -46,7 +42,6 @@ import javax.inject.Inject
 import com.bonnjalal.wikiindaba.R.string as AppText
 
 
-@OptIn(SavedStateHandleSaveableApi::class)
 @HiltViewModel
 class MainViewModel
 @Inject constructor(
@@ -93,6 +88,7 @@ class MainViewModel
             accountService.authenticate(email, password)
             SnackbarManager.showMessage(AppText.login_success)
             navigateAndPopup(PROGRAM_SCREEN, LOGIN_SCREEN)
+            setStateEvent(MainStateEvent.GetProgramEvent)
         }
 
     }
@@ -159,6 +155,9 @@ class MainViewModel
     val dataStateProgram = _dataStateProgram.asStateFlow()
 
 
+    private var _dataStateAttendace = MutableStateFlow<DataState<Attendance>>(DataState.Loading)
+    val dataStateAttendance = _dataStateAttendace.asStateFlow()
+
 
 //        get() = _dataStateProgram
 
@@ -166,6 +165,9 @@ class MainViewModel
 
     var showPrograms = mutableStateOf(false)
         private set
+    var showAttendance = mutableStateOf(false)
+        private set
+    var programId = mutableStateOf("id")
     fun setStateEvent(mainStateEvent: MainStateEvent) {
         viewModelScope.launch {
             when (mainStateEvent) {
@@ -211,6 +213,23 @@ class MainViewModel
                         }
                         .launchIn(viewModelScope)
                 }
+                is MainStateEvent.GetAttendanceEvent -> {
+                    mainRepository.getAttendance(programId.value).onEach { dataState ->
+                        _dataStateAttendace.value = dataState
+                        Log.e("View Model", "attendance: ${dataState.toString()}")
+                        showAttendance.value = when (dataState) {
+                            is DataState.Success -> {
+                                true
+                            }
+                            is DataState.Error -> {
+                                false
+                            }
+                            is DataState.Loading -> {
+                                false
+                            }
+                        }
+                    }.launchIn(viewModelScope)
+                }
                 is MainStateEvent.None -> {
                     // Nothing
                 }
@@ -246,6 +265,7 @@ class MainViewModel
         )
 
 
+    /*
     fun scanQrCode(context: Context){
         val options = GmsBarcodeScannerOptions.Builder()
             .setBarcodeFormats(
@@ -274,10 +294,82 @@ class MainViewModel
             }
             .addOnFailureListener { e ->
                 // Task failed with an exception
+                Log.e("View Model", e.toString())
+
                 e.message?.let { SnackbarManager.showMessage(SnackbarMessage.StringSnackbar(it)) }
             }
 
     }
+
+    fun checkModuleAvailability(context: Context){
+        val moduleInstallClient = ModuleInstall.getClient(context)
+        val optionalModuleApi = TfLite.getClient(context)
+        moduleInstallClient
+            .areModulesAvailable(optionalModuleApi)
+            .addOnSuccessListener {
+                if (it.areModulesAvailable()) {
+                    // Modules are present on the device...
+                    SnackbarManager.showMessage(AppText.module_install_success)
+                    scanQrCode(context)
+
+                } else {
+                    // Modules are not present on the device...
+                    installModule(context, moduleInstallClient)
+                }
+            }
+            .addOnFailureListener {
+                // Handle failure...
+            }
+    }
+
+    fun installModule(context: Context, moduleInstallClient: ModuleInstallClient){
+        val listener = ModuleInstallProgressListener(moduleInstallClient)
+        val optionalModuleApi = TfLite.getClient(context)
+        val moduleInstallRequest =
+            ModuleInstallRequest.newBuilder()
+                .addApi(optionalModuleApi)
+                // Add more APIs if you would like to request multiple optional modules.
+                // .addApi(...)
+                // Set the listener if you need to monitor the download progress.
+                // .setListener(listener)
+                .build()
+
+        moduleInstallClient
+            .installModules(moduleInstallRequest)
+            .addOnSuccessListener {
+//                if (it.areModulesAlreadyInstalled()) {
+                    // Modules are already installed when the request is sent.
+//                }
+                SnackbarManager.showMessage(AppText.module_install_success)
+                scanQrCode(context = context)
+
+            }
+            .addOnFailureListener {
+                // Handle failure…
+                SnackbarManager.showMessage(AppText.module_install_failed)
+            }
+
+    }
+    inner class ModuleInstallProgressListener (private val moduleInstallClient: ModuleInstallClient): InstallStatusListener {
+        override fun onInstallStatusUpdated(update: ModuleInstallStatusUpdate) {
+            // Progress info is only set when modules are in the progress of downloading.
+            update.progressInfo?.let {
+                val progress = (it.bytesDownloaded * 100 / it.totalBytesToDownload).toInt()
+                // Set the progress for the progress bar.
+//                progressBar.setProgress(progress)
+            }
+
+            if (isTerminateState(update.installState)) {
+                moduleInstallClient.unregisterListener(this)
+            }
+        }
+
+        fun isTerminateState(@ModuleInstallStatusUpdate.InstallState state: Int): Boolean {
+            return state == STATE_CANCELED || state == STATE_COMPLETED || state == STATE_FAILED
+        }
+    }
+     */
+
 }
 
 
@@ -285,5 +377,6 @@ sealed class MainStateEvent() {
     object GetAttendeesEvent: MainStateEvent()
     object GetOrganizersEvent: MainStateEvent()
     data object GetProgramEvent: MainStateEvent()
+    data object GetAttendanceEvent: MainStateEvent()
     object None: MainStateEvent()
 }

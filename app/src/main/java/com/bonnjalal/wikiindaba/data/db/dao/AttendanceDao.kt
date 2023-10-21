@@ -19,5 +19,7 @@ interface AttendanceDao {
 
     @Query(value="SELECT * FROM attendance")
     suspend fun get(): List<AttendanceCacheEntity>
+    @Query(value="SELECT * FROM attendance where id = :program_id")
+    suspend fun getAttendance(program_id:String): AttendanceCacheEntity
 
 }

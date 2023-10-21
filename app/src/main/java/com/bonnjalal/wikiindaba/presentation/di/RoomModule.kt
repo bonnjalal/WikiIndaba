@@ -2,6 +2,7 @@ package com.bonnjalal.wikiindaba.presentation.di
 
 import android.content.Context
 import androidx.room.Room
+import com.bonnjalal.wikiindaba.data.db.dao.AttendanceDao
 import com.bonnjalal.wikiindaba.data.db.dao.AttendeeDao
 import com.bonnjalal.wikiindaba.data.db.dao.OrganizerDao
 import com.bonnjalal.wikiindaba.data.db.dao.ProgramDao
@@ -44,6 +45,11 @@ object RoomModule {
     @Provides
     fun provideProgramDao (eventDatabase: EventDatabase): ProgramDao {
         return eventDatabase.programDao()
+    }
+    @Singleton
+    @Provides
+    fun provideAttendanceDao (eventDatabase: EventDatabase): AttendanceDao {
+        return eventDatabase.attendanceDao()
     }
 
 }

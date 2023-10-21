@@ -117,12 +117,16 @@ dependencies {
 //    implementation ("com.google.apis:google-api-services-sheets:v4-rev20220927-2.0.0")
 
     implementation("androidx.lifecycle:lifecycle-runtime-compose:2.6.2")
-    implementation("androidx.compose.runtime:runtime-livedata:1.5.3")
+//    implementation("androidx.compose.runtime:runtime-livedata:1.5.3")
 
     implementation ("com.google.code.gson:gson:2.10.1")
 
-    // scan qr code
-    implementation ("com.google.android.gms:play-services-code-scanner:16.1.0")
+    // quickie scan qr code
+    implementation("io.github.g00fy2.quickie:quickie-bundled:1.8.0")
+//    implementation ("com.google.android.gms:play-services-base:18.2.0")
+//    implementation ("com.google.android.gms:play-services-tflite-java:16.1.0")
+
+//    implementation ("com.google.android.gms:play-services-code-scanner:16.1.0")
 
 
 

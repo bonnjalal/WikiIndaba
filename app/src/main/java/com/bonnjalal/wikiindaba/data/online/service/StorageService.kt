@@ -27,7 +27,7 @@ interface StorageService {
     suspend fun deleteOrganizer(id: String)
 
 //    val attendance: Flow<List<OrganizerOnlineEntity>>
-    suspend fun getAttendance(path: String): Flow<List<AttendanceOnlineEntity>>
+    suspend fun getAttendance(programId: String): Flow<List<AttendanceOnlineEntity>>
     suspend fun saveAttendance(path: String, attendance: AttendanceOnlineEntity): String
     suspend fun updateAttendance(path: String, attendance: AttendanceOnlineEntity)
     suspend fun deleteAttendance(path: String, name: String)

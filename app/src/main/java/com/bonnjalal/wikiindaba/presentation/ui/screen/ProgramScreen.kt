@@ -28,7 +28,6 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.*
-import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -53,6 +52,7 @@ import com.bonnjalal.wikiindaba.common.PROGRAM_SCREEN
 import com.bonnjalal.wikiindaba.common.SCAN_QR_SCREEN
 import com.bonnjalal.wikiindaba.common.compose.CustomTextField
 import com.bonnjalal.wikiindaba.presentation.state.DataState
+import com.bonnjalal.wikiindaba.presentation.ui.MainStateEvent
 import com.bonnjalal.wikiindaba.presentation.ui.MainViewModel
 import com.slaviboy.composeunits.dh
 import com.slaviboy.composeunits.dw
@@ -186,6 +186,8 @@ fun ProgramScreen(navigate: (String) -> Unit,logout:(String) -> Unit, vm: MainVi
                                 .fillMaxWidth(0.85f)
                                 .align(Alignment.CenterHorizontally)
                                 .clickable {
+                                    vm.programId.value = program.id
+                                    vm.setStateEvent(MainStateEvent.GetAttendanceEvent)
                                     if (!userStateAnonymous) navigate(SCAN_QR_SCREEN)
                                 },
                             title = program.title,
