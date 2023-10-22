@@ -16,6 +16,8 @@ import com.bonnjalal.wikiindaba.common.PROGRAM_SCREEN
 import com.bonnjalal.wikiindaba.common.ext.isValidEmail
 import com.bonnjalal.wikiindaba.common.snackbar.SnackbarManager
 import com.bonnjalal.wikiindaba.common.snackbar.SnackbarMessage.Companion.toSnackbarMessage
+import com.bonnjalal.wikiindaba.data.online.online_entity.AttendanceOnlineEntity
+import com.bonnjalal.wikiindaba.data.online.online_entity.mapper.AttendanceOnlineMapper
 import com.bonnjalal.wikiindaba.data.online.service.AccountService
 import com.bonnjalal.wikiindaba.data.repository.MainRepository
 import com.bonnjalal.wikiindaba.presentation.model.Attendance
@@ -88,9 +90,19 @@ class MainViewModel
             accountService.authenticate(email, password)
             SnackbarManager.showMessage(AppText.login_success)
             navigateAndPopup(PROGRAM_SCREEN, LOGIN_SCREEN)
-            setStateEvent(MainStateEvent.GetProgramEvent)
+//            setStateEvent(MainStateEvent.GetProgramEvent)
+//            setStateEvent(MainStateEvent.GetAttendeesEvent)
         }
+    }
 
+    fun getCurrentUser():Boolean{
+        runCatching {
+            if (accountService.hasUser){
+                accountService.currentUser
+                return true
+            }
+        }
+        return false
     }
 
     val userState = accountService.currentUser.map { it.isAnonymous}
@@ -101,7 +113,6 @@ class MainViewModel
             navigateAndPopup(PROGRAM_SCREEN, LOGIN_SCREEN)
             setStateEvent(MainStateEvent.GetProgramEvent)
         }
-
     }
 
     fun onSignOut (clearAndPopUp: (String) -> Unit){
@@ -123,9 +134,19 @@ class MainViewModel
         }
     }
 
+    fun checkAttendee(name:String):Boolean{
+        Log.e("View Model", "List: $attendeesList")
+        for (attendee in attendeesList){
+            if (attendee.name.trim() == name.trim()) return true
+        }
+        return false
+    }
 
-
-
+    fun syncAttendance(){
+        launchCatching {
+            mainRepository.syncAttendance()
+        }
+    }
     /**
      * Program logic
      */
@@ -136,16 +157,18 @@ class MainViewModel
         searchProgramState.value = newValue
     }
 
+    var attendeesList = mutableListOf<Attendee>()
 
 
+//    private val _dataStateAttendee : MutableLiveData<DataState<List<Attendee>>> = MutableLiveData()
+//    val dataStateAttendee : LiveData<DataState<List<Attendee>>>
+//        get() = _dataStateAttendee
 
-    private val _dataStateAttendee : MutableLiveData<DataState<List<Attendee>>> = MutableLiveData()
-    val dataStateAttendee : LiveData<DataState<List<Attendee>>>
-        get() = _dataStateAttendee
+    private val _dataStateAttendee = MutableStateFlow<DataState<List<Attendee>>>(DataState.Loading)
+    val dataStateAttendee = _dataStateAttendee.asStateFlow()
 
-    private val _dataStateOrganizer : MutableLiveData<DataState<List<Organizer>>> = MutableLiveData()
-    val dataStateOrganizer : LiveData<DataState<List<Organizer>>>
-        get() = _dataStateOrganizer
+    private val _dataStateOrganizer = MutableStateFlow<DataState<List<Organizer>>>(DataState.Loading)
+    val dataStateOrganizer = _dataStateOrganizer.asStateFlow()
 
 //    private val _dataStateProgram : MutableLiveData<DataState<List<Program>>> = MutableLiveData()
 //    val dataStateProgram : LiveData<DataState<List<Program>>>
@@ -167,7 +190,7 @@ class MainViewModel
         private set
     var showAttendance = mutableStateOf(false)
         private set
-    var programId = mutableStateOf("id")
+    var program = mutableStateOf<Program?>(null)
     fun setStateEvent(mainStateEvent: MainStateEvent) {
         viewModelScope.launch {
             when (mainStateEvent) {
@@ -175,6 +198,9 @@ class MainViewModel
                     mainRepository.getAttendees()
                         .onEach { dataState ->
                             _dataStateAttendee.value = dataState
+                            if (dataState is DataState.Success){
+                                attendeesList = dataState.data.toMutableList()
+                            }
                         }
                         .launchIn(viewModelScope)
                 }
@@ -182,7 +208,6 @@ class MainViewModel
                 is MainStateEvent.GetOrganizersEvent -> {
                     mainRepository.getOrganizers()
                         .onEach { dataState ->
-
                             _dataStateOrganizer.value = dataState
 
                         }
@@ -192,31 +217,24 @@ class MainViewModel
                     mainRepository.getProgram()
                         .onEach { dataState ->
                             _dataStateProgram.value = dataState
-                            /*when (dataState) {
-
+                            showPrograms.value = when (dataState) {
                                 is DataState.Success -> {
-                                    _dataStateProgram.value = dataState
-                                    showPrograms.value = true
-                                    Log.e("indaba ViewModel", "dataState success: $dataState")
-
-                                    Log.e("indaba ViewModel", "showPrograms: ${showPrograms.value}")
-//                                    Log.e("indaba VeiwModel", " datastate: ${dataStateProgram}")
+                                    true
                                 }
-
                                 is DataState.Error -> {
-                                    showPrograms.value = false
+                                    false
                                 }
                                 is DataState.Loading -> {
-                                    showPrograms.value = false
+                                    false
                                 }
-                            }*/
+                            }
                         }
                         .launchIn(viewModelScope)
                 }
                 is MainStateEvent.GetAttendanceEvent -> {
-                    mainRepository.getAttendance(programId.value).onEach { dataState ->
+                    mainRepository.getAttendance(program.value!!.id).onEach { dataState ->
                         _dataStateAttendace.value = dataState
-                        Log.e("View Model", "attendance: ${dataState.toString()}")
+//                        Log.e("View Model", "attendance: ${dataState.toString()}")
                         showAttendance.value = when (dataState) {
                             is DataState.Success -> {
                                 true
@@ -229,6 +247,12 @@ class MainViewModel
                             }
                         }
                     }.launchIn(viewModelScope)
+                }
+                is MainStateEvent.DeleteAttendanceEvent -> {
+                    mainRepository.deleteAttendance(mainStateEvent.programId, mainStateEvent.attendance).launchIn(viewModelScope)
+                }
+                is MainStateEvent.SaveAttendanceEvent-> {
+                   mainRepository.saveAttendance(mainStateEvent.programId, mainStateEvent.attendance).launchIn(viewModelScope)
                 }
                 is MainStateEvent.None -> {
                     // Nothing
@@ -374,9 +398,11 @@ class MainViewModel
 
 
 sealed class MainStateEvent() {
-    object GetAttendeesEvent: MainStateEvent()
-    object GetOrganizersEvent: MainStateEvent()
+    data object GetAttendeesEvent: MainStateEvent()
+    data object GetOrganizersEvent: MainStateEvent()
     data object GetProgramEvent: MainStateEvent()
     data object GetAttendanceEvent: MainStateEvent()
+    data class SaveAttendanceEvent(val programId: String, val attendance: AttendanceOnlineEntity) : MainStateEvent()
+    data class DeleteAttendanceEvent(val programId: String, val attendance: AttendanceOnlineEntity) : MainStateEvent()
     object None: MainStateEvent()
 }

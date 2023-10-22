@@ -39,7 +39,9 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.bonnjalal.wikiindaba.R
 import com.bonnjalal.wikiindaba.common.snackbar.SnackbarManager
 import com.bonnjalal.wikiindaba.common.snackbar.SnackbarMessage
+import com.bonnjalal.wikiindaba.data.online.online_entity.AttendanceOnlineEntity
 import com.bonnjalal.wikiindaba.presentation.state.DataState
+import com.bonnjalal.wikiindaba.presentation.ui.MainStateEvent
 import com.bonnjalal.wikiindaba.presentation.ui.MainViewModel
 import com.slaviboy.composeunits.dh
 import com.slaviboy.composeunits.dw
@@ -55,7 +57,7 @@ import io.github.g00fy2.quickie.config.ScannerConfig
 fun ScanQrScreen (openAndPopUp: (String, String) -> Unit,popup: () -> Unit, vm:MainViewModel = hiltViewModel()) {
 
 //    val attendanceState by vm.dataStateAttendance.collectAsStateWithLifecycle()
-    var showAttendance by remember { vm.showAttendance }
+    val showAttendance by remember { vm.showAttendance }
 
     val scanQrCodeLauncher = rememberLauncherForActivityResult(ScanCustomCode()) { result ->
         // handle QRResult
@@ -65,7 +67,17 @@ fun ScanQrScreen (openAndPopUp: (String, String) -> Unit,popup: () -> Unit, vm:M
                 // decoding with default UTF-8 charset when rawValue is null will not result in meaningful output, demo purpose
                     ?: result.content.rawBytes?.let { String(it) }.orEmpty()
 
-                SnackbarManager.showMessage(SnackbarMessage.StringSnackbar(value))
+                /**
+                 * needs more logic to check if the name is in the attendees list
+                 */
+                val isInAttendees = vm.checkAttendee(value)
+                if (isInAttendees){
+                    vm.setStateEvent(MainStateEvent.SaveAttendanceEvent(vm.program.value!!.id, AttendanceOnlineEntity(value)))
+                    vm.setStateEvent(MainStateEvent.GetAttendanceEvent)
+                }else {
+                    SnackbarManager.showMessage(SnackbarMessage.StringSnackbar("Error: $value is not in Attendees List"))
+                }
+
             }
             QRResult.QRUserCanceled -> SnackbarManager.showMessage(R.string.by_user_error)
             QRResult.QRMissingPermission -> SnackbarManager.showMessage(SnackbarMessage.StringSnackbar("Please grant the app Camera permission"))
@@ -86,7 +98,7 @@ fun ScanQrScreen (openAndPopUp: (String, String) -> Unit,popup: () -> Unit, vm:M
             Spacer(modifier = Modifier.fillMaxWidth(0.1f))
             Text(
                 modifier = Modifier.fillMaxWidth(0.8f),
-                text = "How to become an administrator on the English Wikipedia",
+                text = vm.program.value?.title ?: "Title",
                 style = TextStyle(
                     fontSize = 0.025.sh,
 //                    lineHeight = 22.5.sp,
@@ -159,7 +171,7 @@ fun ScanQrScreen (openAndPopUp: (String, String) -> Unit,popup: () -> Unit, vm:M
         )
 
         Spacer(modifier = Modifier.height(0.03.dh))
-        val context = LocalContext.current
+//        val context = LocalContext.current
         Box (modifier = Modifier
             .height(0.05.dh)
             .fillMaxWidth(0.8f)
@@ -286,7 +298,10 @@ fun ScanQrScreen (openAndPopUp: (String, String) -> Unit,popup: () -> Unit, vm:M
 
                         IconButton(
                             modifier = Modifier.align(Alignment.CenterVertically),
-                            onClick = { /*TODO*/ }) {
+                            onClick = {
+                                vm.setStateEvent(MainStateEvent.DeleteAttendanceEvent(vm.program.value!!.id, AttendanceOnlineEntity(attendance)))
+                                vm.setStateEvent(MainStateEvent.GetAttendanceEvent)
+                            }) {
                             Icon(imageVector = ImageVector.vectorResource(R.drawable.delete_icon),
                                 contentDescription = "delete icon",
                                 tint = Color(0xFFA1A1A1))

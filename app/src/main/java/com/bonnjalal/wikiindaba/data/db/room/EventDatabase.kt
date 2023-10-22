@@ -17,7 +17,7 @@ import com.bonnjalal.wikiindaba.data.db.dao.OrganizerDao
 import com.bonnjalal.wikiindaba.data.db.dao.ProgramDao
 
 @TypeConverters(value = [IndabaTypeConverters::class])
-@Database(entities = [AttendeeCacheEntity::class , OrganizerCacheEntity::class, ProgramCacheEntity::class, AttendanceCacheEntity::class], version = 5)
+@Database(entities = [AttendeeCacheEntity::class , OrganizerCacheEntity::class, ProgramCacheEntity::class, AttendanceCacheEntity::class], version = 6)
 abstract class EventDatabase : RoomDatabase() {
     abstract fun attendeeDao() : AttendeeDao
     abstract fun organizerDao() : OrganizerDao

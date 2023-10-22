@@ -62,28 +62,33 @@ import com.slaviboy.composeunits.sh
 @Composable
 fun ProgramScreen(navigate: (String) -> Unit,logout:(String) -> Unit, vm: MainViewModel = hiltViewModel()){
 
+    LaunchedEffect(key1 = Unit, block = {
+        vm.syncAttendance()
+        vm.setStateEvent(MainStateEvent.GetProgramEvent)
+        vm.setStateEvent(MainStateEvent.GetAttendeesEvent)
+    })
     val uiState by vm.searchProgramState
     val userStateAnonymous by vm.userState.collectAsStateWithLifecycle(initialValue = false)
-    val programState by vm.dataStateProgram.collectAsStateWithLifecycle()
-    var showPrograms by remember {vm.showPrograms}
+//    val programState by vm.dataStateProgram.collectAsStateWithLifecycle()
+    val showPrograms by remember {vm.showPrograms}
 
 //    var showPrograms by remember { mutableStateOf(false) }
 //    var showLoadingBar by remember { mutableStateOf(true) }
 
-    Log.e("indaba ViewModel", "dataState success show: ${vm.showPrograms}")
-    LaunchedEffect(key1 = programState, block = {
-        showPrograms = when (programState) {
-            is DataState.Success -> {
-                true
-            }
-            is DataState.Error -> {
-                false
-            }
-            is DataState.Loading -> {
-                false
-            }
-        }
-    } )
+//    Log.e("indaba ViewModel", "dataState success show: ${vm.showPrograms}")
+//    LaunchedEffect(key1 = programState, block = {
+//        showPrograms = when (programState) {
+//            is DataState.Success -> {
+//                true
+//            }
+//            is DataState.Error -> {
+//                false
+//            }
+//            is DataState.Loading -> {
+//                false
+//            }
+//        }
+//    } )
     ConstraintLayout(modifier = Modifier
         .fillMaxSize()
         .background(color = Color(0xFFA39274))) {
@@ -186,7 +191,7 @@ fun ProgramScreen(navigate: (String) -> Unit,logout:(String) -> Unit, vm: MainVi
                                 .fillMaxWidth(0.85f)
                                 .align(Alignment.CenterHorizontally)
                                 .clickable {
-                                    vm.programId.value = program.id
+                                    vm.program.value = program
                                     vm.setStateEvent(MainStateEvent.GetAttendanceEvent)
                                     if (!userStateAnonymous) navigate(SCAN_QR_SCREEN)
                                 },

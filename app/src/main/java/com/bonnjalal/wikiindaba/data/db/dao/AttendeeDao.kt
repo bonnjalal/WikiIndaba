@@ -7,16 +7,15 @@ import androidx.room.Query
 import com.bonnjalal.wikiindaba.data.db.cache_entity.AttendeeCacheEntity
 
 @Dao
-interface AttendeeDao {
+abstract class AttendeeDao: BaseDao<AttendeeCacheEntity>() {
 
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insert (attendeeEntity: AttendeeCacheEntity): Long
-
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insert (attendeeEntity: List<AttendeeCacheEntity>)
-
+    //    @Insert(onConflict = OnConflictStrategy.REPLACE)
+//    suspend fun insert (attendeeEntity: AttendeeCacheEntity): Long
+//
+//    @Insert(onConflict = OnConflictStrategy.REPLACE)
+//    suspend fun insert (attendeeEntity: List<AttendeeCacheEntity>): List<Long>
+//
     @Query(value="SELECT * FROM attendees")
-    suspend fun get(): List<AttendeeCacheEntity>
+    abstract suspend fun get(): List<AttendeeCacheEntity>
 
-    
 }

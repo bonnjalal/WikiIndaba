@@ -7,7 +7,9 @@ import com.bonnjalal.wikiindaba.data.online.online_entity.OrganizerOnlineEntity
 import com.bonnjalal.wikiindaba.data.online.online_entity.ProgramOnlineEntity
 import com.bonnjalal.wikiindaba.data.online.service.AccountService
 import com.bonnjalal.wikiindaba.data.online.service.StorageService
+import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.Source
 import com.google.firebase.firestore.ktx.dataObjects
 import com.google.firebase.firestore.ktx.toObject
 import kotlinx.coroutines.flow.Flow
@@ -20,15 +22,19 @@ class StorageServiceImpl
 constructor(private val firestore: FirebaseFirestore, private val auth: AccountService) :
     StorageService {
 
-    override val attendees: Flow<List<AttendeeOnlineEntity>>
-        get() =
-            firestore.collection(ATTENDEE_COLLECTION).dataObjects()
+//    override val attendees: Flow<List<AttendeeOnlineEntity>>
+//        get() =
+//              firestore.collection(ATTENDEE_COLLECTION).dataObjects()
+//            val documentReference: DocumentReference= FirebaseFirestore.getInstance().document(ATTENDEE_COLLECTION).get
 //            auth.currentUser.flatMapLatest { user ->
 //                firestore.collection(ATTENDEE_COLLECTION).whereEqualTo(USER_ID_FIELD, user.id).dataObjects()
 //            }
 
+    override suspend fun getAttendees(): List<AttendeeOnlineEntity> {
+        return firestore.collection(ATTENDEE_COLLECTION).get(Source.SERVER).await().toObjects(AttendeeOnlineEntity::class.java)
+    }
     override suspend fun getAttendee(id: String): AttendeeOnlineEntity? =
-        firestore.collection(ATTENDEE_COLLECTION).document(id).get().await().toObject<AttendeeOnlineEntity?>()//?.copy(id = id)
+        firestore.collection(ATTENDEE_COLLECTION).document(id).get().await().toObject()//?.copy(id = id)
 
     override suspend fun saveAttendee(attendee: AttendeeOnlineEntity): String {
         TODO("Not yet implemented")
@@ -51,14 +57,17 @@ constructor(private val firestore: FirebaseFirestore, private val auth: AccountS
         firestore.collection(ATTENDEE_COLLECTION).document(id).delete().await()
     }
 
-    override val programs: Flow<List<ProgramOnlineEntity>>
-        get() =
-            firestore.collection(PROGRAM_COLLECTION).dataObjects()
+//    override val programs: Flow<List<ProgramOnlineEntity>>
+//        get() =
+//            firestore.collection(PROGRAM_COLLECTION).dataObjects()
 
 //            auth.currentUser.flatMapLatest { user ->
 //                firestore.collection(PROGRAM_COLLECTION).whereEqualTo(USER_ID_FIELD, user.id).dataObjects()
 //            }
 
+    override suspend fun getPrograms(): List<ProgramOnlineEntity> {
+        return firestore.collection(PROGRAM_COLLECTION).get(Source.SERVER).await().toObjects(ProgramOnlineEntity::class.java)
+    }
     override suspend fun getProgram(id: String): ProgramOnlineEntity? =
         firestore.collection(PROGRAM_COLLECTION).document(id).get().await().toObject()//?.copy(id = id)
 
@@ -114,22 +123,27 @@ constructor(private val firestore: FirebaseFirestore, private val auth: AccountS
     }
 
 
-    override suspend fun getAttendance(programId: String): Flow<List<AttendanceOnlineEntity>> =
-        firestore.collection("$PROGRAM_COLLECTION/$programId/attendance").dataObjects()
+    override suspend fun getAttendance(programId: String): List<AttendanceOnlineEntity> =
+//        firestore.collection("$PROGRAM_COLLECTION/$programId/attendance").dataObjects()
+        firestore.collection("$PROGRAM_COLLECTION/$programId/attendance").get(Source.SERVER).await().toObjects(AttendanceOnlineEntity::class.java)
 
-    override suspend fun saveAttendance(path:String, attendance: AttendanceOnlineEntity): String =
+    override suspend fun saveAttendance(programId:String, attendance: AttendanceOnlineEntity): String =
         traceAsync(SAVE_ATTENDANCE_TRACE, cookie = 40, block = {
-            firestore.collection("$PROGRAM_COLLECTION/$path").add(attendance).await().id
+//            firestore.collection("$PROGRAM_COLLECTION/$programId/attendance").add(attendance).await().id
+            firestore.collection("$PROGRAM_COLLECTION/$programId/attendance").add(attendance).await().id
         })
 
     override suspend fun updateAttendance(programId:String, attendance: AttendanceOnlineEntity) {
+//        firestore.collection("$PROGRAM_COLLECTION/$programId/attendance").document(attendance.name).set(attendance)
         traceAsync(UPDATE_ATTENDANCE_TRACE, cookie = 41) {
-            firestore.collection("$PROGRAM_COLLECTION/$programId/attendance").document(attendance.name).set(attendance).await()
+//            firestore.collection("$PROGRAM_COLLECTION/$programId/attendance").document(attendance.name).set(attendance).await()
+            firestore.collection("$PROGRAM_COLLECTION/$programId/attendance").document(attendance.name).set(attendance)
         }
     }
 
     override suspend fun deleteAttendance(programId: String, name:String) {
-        firestore.collection("$PROGRAM_COLLECTION/$programId/attendance").document(name).delete().await()
+//        firestore.collection("$PROGRAM_COLLECTION/$programId/attendance").document(name).delete().await()
+        firestore.collection("$PROGRAM_COLLECTION/$programId/attendance").document(name).delete()
     }
 
     companion object {

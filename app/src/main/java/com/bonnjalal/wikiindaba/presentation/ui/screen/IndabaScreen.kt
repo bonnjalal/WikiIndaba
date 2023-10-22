@@ -13,6 +13,7 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.ReadOnlyComposable
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -43,6 +44,7 @@ fun IndabaScreen(vm:MainViewModel = hiltViewModel()) {
 //    val navController = rememberNavController()
 
 
+
     CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Ltr ) {
         Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
 
@@ -66,7 +68,7 @@ fun IndabaScreen(vm:MainViewModel = hiltViewModel()) {
 
                 ) {
                 // Screen content
-                NavHost(navController = appState.navController, startDestination = LOGIN_SCREEN) {
+                NavHost(navController = appState.navController, startDestination = if (vm.getCurrentUser()) PROGRAM_SCREEN else LOGIN_SCREEN) {
                     composable(LOGIN_SCREEN) { LoginScreen(
                         vm = vm,
                         navigateAndPopup = { route, popup -> appState.navigateAndPopUp(route, popup) }) }

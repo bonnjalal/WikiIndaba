@@ -8,13 +8,15 @@ import com.bonnjalal.wikiindaba.presentation.model.Attendee
 import kotlinx.coroutines.flow.Flow
 
 interface StorageService {
-    val attendees: Flow<List<AttendeeOnlineEntity>>
+//    val attendees: Flow<List<AttendeeOnlineEntity>>
+    suspend fun getAttendees(): List<AttendeeOnlineEntity>
     suspend fun getAttendee(id: String): AttendeeOnlineEntity?
     suspend fun saveAttendee(attendee: AttendeeOnlineEntity): String
     suspend fun updateAttendee(attendee: AttendeeOnlineEntity)
     suspend fun deleteAttendee(id: String)
 
-    val programs: Flow<List<ProgramOnlineEntity>>
+//    val programs: Flow<List<ProgramOnlineEntity>>
+    suspend fun getPrograms(): List<ProgramOnlineEntity>
     suspend fun getProgram(id: String): ProgramOnlineEntity?
     suspend fun saveProgram(program: ProgramOnlineEntity): String
     suspend fun updateProgram(program: ProgramOnlineEntity)
@@ -27,7 +29,7 @@ interface StorageService {
     suspend fun deleteOrganizer(id: String)
 
 //    val attendance: Flow<List<OrganizerOnlineEntity>>
-    suspend fun getAttendance(programId: String): Flow<List<AttendanceOnlineEntity>>
+    suspend fun getAttendance(programId: String): List<AttendanceOnlineEntity>
     suspend fun saveAttendance(path: String, attendance: AttendanceOnlineEntity): String
     suspend fun updateAttendance(path: String, attendance: AttendanceOnlineEntity)
     suspend fun deleteAttendance(path: String, name: String)
