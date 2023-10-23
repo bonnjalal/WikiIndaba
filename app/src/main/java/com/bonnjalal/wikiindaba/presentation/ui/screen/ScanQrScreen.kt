@@ -1,6 +1,10 @@
 package com.bonnjalal.wikiindaba.presentation.ui.screen
 
 import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -17,11 +21,16 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.KeyboardArrowRight
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -37,6 +46,7 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.bonnjalal.wikiindaba.R
+import com.bonnjalal.wikiindaba.common.compose.CustomTextField
 import com.bonnjalal.wikiindaba.common.snackbar.SnackbarManager
 import com.bonnjalal.wikiindaba.common.snackbar.SnackbarMessage
 import com.bonnjalal.wikiindaba.data.online.online_entity.AttendanceOnlineEntity
@@ -77,7 +87,6 @@ fun ScanQrScreen (openAndPopUp: (String, String) -> Unit,popup: () -> Unit, vm:M
                 }else {
                     SnackbarManager.showMessage(SnackbarMessage.StringSnackbar("Error: $value is not in Attendees List"))
                 }
-
             }
             QRResult.QRUserCanceled -> SnackbarManager.showMessage(R.string.by_user_error)
             QRResult.QRMissingPermission -> SnackbarManager.showMessage(SnackbarMessage.StringSnackbar("Please grant the app Camera permission"))
@@ -89,6 +98,8 @@ fun ScanQrScreen (openAndPopUp: (String, String) -> Unit,popup: () -> Unit, vm:M
     }
 
 
+
+    val manualAddState by vm.manualAttendanceState
     Column (modifier = Modifier
         .background(color = Color(0xFFFFFFFF))
         .fillMaxSize()) {
@@ -210,17 +221,31 @@ fun ScanQrScreen (openAndPopUp: (String, String) -> Unit,popup: () -> Unit, vm:M
             )
         }
         Spacer(modifier = Modifier.height(0.016.dh))
-        OutlinedButton(
+
+        var addFeildVisible by remember { mutableStateOf(false) }
+        AnimatedVisibility(
             modifier = Modifier
 //                    .offset(x = 0.07.dw, y = 0.2.dh)
                 .height(0.05.dh)
                 .fillMaxWidth(0.8f)
                 .align(Alignment.CenterHorizontally)
             ,
+            visible = !addFeildVisible,
+            enter = fadeIn(
+                // Overwrites the initial value of alpha to 0.4f for fade in, 0 by default
+                initialAlpha = 0.4f
+            ),
+            exit = fadeOut(
+                // Overwrites the default animation with tween
+                animationSpec = tween(durationMillis = 250)
+            )
+        ) {
+            // Content that needs to appear/disappear goes here:
+            OutlinedButton(
             border = BorderStroke(color = Color(0xFF531B1C), width = 1.3.dp),
             shape = RoundedCornerShape(size = 0.01.dh),
             onClick = {
-
+                addFeildVisible = true
             }) {
             Text(
                 text = "Manually",
@@ -232,6 +257,33 @@ fun ScanQrScreen (openAndPopUp: (String, String) -> Unit,popup: () -> Unit, vm:M
                 )
             )
         }
+        }
+        AnimatedVisibility(
+            modifier = Modifier
+                .height(0.05.dh)
+                .fillMaxWidth(0.8f)
+                .align(Alignment.CenterHorizontally),
+            visible = addFeildVisible,
+            enter = fadeIn(
+                // Overwrites the initial value of alpha to 0.4f for fade in, 0 by default
+                initialAlpha = 0.4f
+            ),
+            exit = fadeOut(
+                // Overwrites the default animation with tween
+                animationSpec = tween(durationMillis = 250)
+            )
+        ) {
+            // Content that needs to appear/disappear goes here:
+            AddAttendanceField(value = manualAddState, onNewValue = vm::onManualAttendanceStateChange,
+                addClicked = {
+                    vm.setStateEvent(MainStateEvent.SaveAttendanceEvent(vm.program.value!!.id, AttendanceOnlineEntity(manualAddState)))
+                    vm.setStateEvent(MainStateEvent.GetAttendanceEvent)
+                    addFeildVisible = false
+                }
+            )
+        }
+
+
         /*Box (modifier = Modifier
             .height(0.05.dh)
             .fillMaxWidth(0.8f)
@@ -283,8 +335,10 @@ fun ScanQrScreen (openAndPopUp: (String, String) -> Unit,popup: () -> Unit, vm:M
 
                     Row(Modifier.padding(0.dp)){
                         Text(
-                            modifier = Modifier.padding(end = 0.016.dw)
-                                .fillMaxWidth(0.9f).align(Alignment.CenterVertically),
+                            modifier = Modifier
+                                .padding(end = 0.016.dw)
+                                .fillMaxWidth(0.9f)
+                                .align(Alignment.CenterVertically),
                             text = attendance,
                             style = TextStyle(
                                 fontSize = 0.017.sh,
@@ -322,4 +376,51 @@ fun ScanQrScreen (openAndPopUp: (String, String) -> Unit,popup: () -> Unit, vm:M
 
 
     }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun AddAttendanceField(value: String,  onNewValue: (String) -> Unit,addClicked: () -> Unit, modifier: Modifier = Modifier) {
+
+    CustomTextField(modifier = modifier
+//                .padding(top = 60.dp)
+//                .height(52.dp),
+        ,
+        singleLine = true,
+        trailingIcon = {
+            IconButton(onClick = {
+                addClicked()
+            }) {
+                Icon(modifier = Modifier.background(Color(0xFF531B1C), shape = RoundedCornerShape(8.dp)),
+                    imageVector = Icons.Filled.Add,
+                    contentDescription = "Add icon")
+            }
+
+        },
+        placeholder = { Text(
+            text = "Enter attendee name ...",
+            style = TextStyle(
+//                fontSize = 13.sp,
+//                lineHeight = 17.sp,
+//                fontFamily = FontFamily(Font(R.font.poppins)),
+                fontWeight = FontWeight(300),
+                color = Color(0xFF6D6D6D),
+            )
+        ) },
+        colors = TextFieldDefaults.textFieldColors(containerColor =  Color(0xFFF3F3F3),
+            disabledTextColor = Color.Transparent,
+            focusedIndicatorColor = Color.Transparent,
+            unfocusedIndicatorColor = Color.Transparent,
+            disabledIndicatorColor = Color.Transparent
+        ),
+        shape = RoundedCornerShape(size = 10.dp),
+        value = value,
+        textStyle = TextStyle(
+            fontSize = 14.sp,
+//                        fontFamily = FontFamily(Font(R.font.poppins)),
+            fontWeight = FontWeight(400),
+            color = Color(0xFFA39274),
+        ) , onValueChange = {
+            onNewValue(it)
+        })
 }

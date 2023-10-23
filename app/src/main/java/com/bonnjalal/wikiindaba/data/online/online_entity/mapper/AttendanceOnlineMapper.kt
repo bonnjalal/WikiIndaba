@@ -13,7 +13,7 @@ class AttendanceOnlineMapper @Inject constructor(){
         val nameList: List<String> = entity.map { it.name }
         return AttendanceCacheEntity(
             programId = programID,
-            Attendance(programID, nameList)
+            name = Attendance(programID, nameList),
         )
     }
 

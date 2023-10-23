@@ -13,5 +13,4 @@ data class AttendanceCacheEntity(
 
     @ColumnInfo(name = "attendance")
     var name: Attendance,
-
 )

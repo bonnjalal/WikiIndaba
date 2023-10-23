@@ -52,6 +52,7 @@ import com.bonnjalal.wikiindaba.common.PROGRAM_SCREEN
 import com.bonnjalal.wikiindaba.common.SCAN_QR_SCREEN
 import com.bonnjalal.wikiindaba.common.compose.CustomTextField
 import com.bonnjalal.wikiindaba.presentation.state.DataState
+import com.bonnjalal.wikiindaba.presentation.state.ProgramStartState
 import com.bonnjalal.wikiindaba.presentation.ui.MainStateEvent
 import com.bonnjalal.wikiindaba.presentation.ui.MainViewModel
 import com.slaviboy.composeunits.dh
@@ -62,15 +63,18 @@ import com.slaviboy.composeunits.sh
 @Composable
 fun ProgramScreen(navigate: (String) -> Unit,logout:(String) -> Unit, vm: MainViewModel = hiltViewModel()){
 
-    LaunchedEffect(key1 = Unit, block = {
-        vm.syncAttendance()
-        vm.setStateEvent(MainStateEvent.GetProgramEvent)
-        vm.setStateEvent(MainStateEvent.GetAttendeesEvent)
-    })
     val uiState by vm.searchProgramState
     val userStateAnonymous by vm.userState.collectAsStateWithLifecycle(initialValue = false)
 //    val programState by vm.dataStateProgram.collectAsStateWithLifecycle()
     val showPrograms by remember {vm.showPrograms}
+
+    LaunchedEffect(key1 = Unit, block = {
+//        vm.syncAttendance()
+        vm.setStateEvent(MainStateEvent.GetProgramEvent)
+        if (!userStateAnonymous){
+            vm.setStateEvent(MainStateEvent.GetAttendeesEvent)
+        }
+    })
 
 //    var showPrograms by remember { mutableStateOf(false) }
 //    var showLoadingBar by remember { mutableStateOf(true) }
@@ -155,7 +159,7 @@ fun ProgramScreen(navigate: (String) -> Unit,logout:(String) -> Unit, vm: MainVi
 
                 Image(
                     modifier = Modifier
-                        .padding(start = 0.008.dp)
+                        .padding(start = 0.01.dp)
                         .height(0.025.dh)
                         .width(0.050.dw)
                         .align(Alignment.CenterVertically),
@@ -176,16 +180,24 @@ fun ProgramScreen(navigate: (String) -> Unit,logout:(String) -> Unit, vm: MainVi
             Spacer(Modifier.height(0.03.dh))
 
             if (showPrograms) {
+                var cardColor by remember { mutableStateOf(Color(0xFFF5EEDF))}
                 LazyColumn(modifier = Modifier.align(Alignment.CenterHorizontally)) {
-                    // Add a single item
-//                item {
-//                    Text(text = "First item")
-//                }
 
-                    // Add 5 items
+                    items((vm.dataStateProgram.value as DataState.Success).data.filter {
+                        val time = vm.getDateTime(it.startTime, it.endTime)
+                        it.title.contains(uiState, ignoreCase = true) ||
+                                it.room.contains(uiState, ignoreCase = true) || it.authors.contains(uiState, ignoreCase = true)
+                                || time.contains(uiState, ignoreCase = true)
+                    },
+                        key = {it.id}) { program ->
+//                        val time = vm.getDateTime(program.startTime, program.endTime)
+                        val programState = vm.compareDates(program.startTime, program.endTime)
+                        cardColor = when (programState){
+                            ProgramStartState.NOW -> Color(0xFFDAF5D6)
+                            ProgramStartState.SOON -> Color(0xFFF2F3CF)
+                            ProgramStartState.NONE -> Color(0xFFF5EEDF)
+                        }
 
-                    items((vm.dataStateProgram.value as DataState.Success).data) { program ->
-                        val time = vm.getDateTime(program.startTime, program.endTime)
                         ProgramCard(
                             modifier = Modifier
                                 .fillMaxWidth(0.85f)
@@ -194,10 +206,10 @@ fun ProgramScreen(navigate: (String) -> Unit,logout:(String) -> Unit, vm: MainVi
                                     vm.program.value = program
                                     vm.setStateEvent(MainStateEvent.GetAttendanceEvent)
                                     if (!userStateAnonymous) navigate(SCAN_QR_SCREEN)
-                                },
+                                }.background(color = cardColor, shape = RoundedCornerShape(size = 0.012.dh)),
                             title = program.title,
                             room = program.room,
-                            time = time,
+                            time = vm.getDateTime(program.startTime, program.endTime),
                             authors = program.authors
                         )
                         Spacer(Modifier.height(0.01.dh))
@@ -277,7 +289,7 @@ fun SearchField(value: String,  onNewValue: (String) -> Unit, modifier: Modifier
 fun ProgramCard(modifier: Modifier, title:String, authors:String, room:String, time:String){
     Column (modifier = modifier
 //        .padding(horizontal = 8.dp)
-        .background(color = Color(0xFFF5EEDF), shape = RoundedCornerShape(size = 0.012.dh)) ) {
+         ) {
 
         Text(
             modifier = Modifier.padding(start = 0.03.dw, top = 8.dp, end = 0.03.dw),

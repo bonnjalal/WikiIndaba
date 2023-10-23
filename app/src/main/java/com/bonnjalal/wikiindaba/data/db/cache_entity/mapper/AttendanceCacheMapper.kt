@@ -20,7 +20,7 @@ class AttendanceCacheMapper @Inject constructor():
     override fun mapToEntity(model: Attendance): AttendanceCacheEntity {
         return AttendanceCacheEntity(
             programId = model.program,
-            name = model
+            name = model,
         )
     }
 

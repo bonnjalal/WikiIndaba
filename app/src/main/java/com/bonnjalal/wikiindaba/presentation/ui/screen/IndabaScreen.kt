@@ -43,14 +43,10 @@ import kotlinx.coroutines.CoroutineScope
 fun IndabaScreen(vm:MainViewModel = hiltViewModel()) {
 //    val navController = rememberNavController()
 
-
-
     CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Ltr ) {
         Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
 
             val appState = rememberAppState()
-
-
 
 //        val snackbarHostState = remember { SnackbarHostState() }
             Scaffold(

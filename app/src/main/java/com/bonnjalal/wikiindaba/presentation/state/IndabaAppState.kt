@@ -30,7 +30,6 @@ class IndabaAppState(
 
     fun popUp() {
         navController.popBackStack()
-        SnackbarManager.showMessage(R.string.anonymous_login_success)
     }
 
     fun navigate(route: String) {

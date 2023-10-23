@@ -23,7 +23,8 @@ abstract class AttendanceDao: BaseDao<AttendanceCacheEntity>() {
     abstract suspend fun get(): List<AttendanceCacheEntity>
     @Query(value="SELECT * FROM attendance where id = :program_id")
     abstract suspend fun getAttendance(program_id:String): AttendanceCacheEntity
-
+    @Query("SELECT COUNT() FROM attendance WHERE id = :program_id")
+    abstract suspend fun isExist(program_id:String):Int
     @Delete
     abstract suspend fun delete(attendance:AttendanceCacheEntity)
 }

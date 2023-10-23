@@ -26,6 +26,7 @@ import com.bonnjalal.wikiindaba.presentation.model.Organizer
 import com.bonnjalal.wikiindaba.presentation.model.Program
 import com.bonnjalal.wikiindaba.presentation.state.DataState
 import com.bonnjalal.wikiindaba.presentation.state.LoginUiState
+import com.bonnjalal.wikiindaba.presentation.state.ProgramStartState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineScope
@@ -37,6 +38,9 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import java.security.AccessController.getContext
 import java.text.SimpleDateFormat
+import java.time.Instant
+import java.time.LocalDateTime
+import java.util.Calendar
 import java.util.Date
 import java.util.Locale
 import java.util.TimeZone
@@ -98,7 +102,7 @@ class MainViewModel
     fun getCurrentUser():Boolean{
         runCatching {
             if (accountService.hasUser){
-                accountService.currentUser
+//                accountService.currentUser
                 return true
             }
         }
@@ -142,11 +146,11 @@ class MainViewModel
         return false
     }
 
-    fun syncAttendance(){
+    /*fun syncAttendance(){
         launchCatching {
             mainRepository.syncAttendance()
         }
-    }
+    }*/
     /**
      * Program logic
      */
@@ -184,6 +188,11 @@ class MainViewModel
 
 //        get() = _dataStateProgram
 
+    var manualAttendanceState = mutableStateOf("")
+        private set
+    fun onManualAttendanceStateChange(newValue: String) {
+        manualAttendanceState.value = newValue
+    }
 
 
     var showPrograms = mutableStateOf(false)
@@ -277,6 +286,24 @@ class MainViewModel
         }
     }
 
+    fun compareDates(startTime:Date, endTime:Date):ProgramStartState{
+
+        val calendar = Calendar.getInstance()
+        calendar.time = Date() // Set your date object here
+        val currentTime = calendar.time
+        calendar.add(Calendar.MINUTE, 30)
+        val currTimePlus30 = calendar.time
+
+//        Log.e("Compare Dates", "startDate: $startTime")
+//        Log.e("Compare Dates", "endDate: $endTime")
+//        Log.e("Compare Dates", "currentDate: $currentTime")
+//        Log.e("Compare Dates", "currentDateMinus30: $currTimePlus30")
+        if (startTime <= currTimePlus30 && startTime > currentTime) return ProgramStartState.SOON
+        else if (startTime <= currentTime && endTime >= currentTime) return ProgramStartState.NOW
+
+        return ProgramStartState.NONE
+
+    }
     fun launchCatching(snackbar: Boolean = true, block: suspend CoroutineScope.() -> Unit) =
         viewModelScope.launch(
             CoroutineExceptionHandler { _, throwable ->

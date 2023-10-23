@@ -125,10 +125,16 @@ constructor(
             emit(DataState.Error(e))
         }
         try {
-            val cachedAttendance = attendanceDao.getAttendance(programId)
-            val attendance = attendanceCacheMapper.mapFromEntity(cachedAttendance)
+            val isExist = attendanceDao.isExist(programId)
+            if (isExist > 0){
+                val cachedAttendance = attendanceDao.getAttendance(programId)
+                val attendance = attendanceCacheMapper.mapFromEntity(cachedAttendance)
 
-            emit(DataState.Success(attendance))
+                emit(DataState.Success(attendance))
+            }else {
+                emit(DataState.Success(Attendance(programId, emptyList())))
+            }
+
 //            for (att in attendance.attendanceList){
 //                val atten = AttendanceOnlineEntity(name = att)
 //                storageService.updateAttendance(programId, atten)
@@ -144,29 +150,30 @@ constructor(
         emit(DataState.Loading)
 
         try {
-            Log.e("indaba Repository", "before save online")
              storageService.updateAttendance(programId,attendance)
 //             emit(DataState.Success(true))
-            Log.e("indaba Repository", "After emit program")
         }catch (e:Exception) {
-            Log.e("indaba Repository", "save Excep 1: ${e.message}")
             emit(DataState.Error(e))
         }
-        Log.e("indaba Repository", "after exp")
         try {
-            val dbAttendance = attendanceDao.getAttendance(programId).name.attendanceList
-            Log.e("indaba Repository", "oldDbAtt: $dbAttendance")
-            val attList = mutableListOf<String>()
-            attList.addAll(dbAttendance)
-            if (!attList.contains(attendance.name)) attList.add(attendance.name)
+            val isExist = attendanceDao.isExist(programId)
+            if (isExist > 0){
+                val dbAttendance = attendanceDao.getAttendance(programId).name.attendanceList
+                val attList = mutableListOf<String>()
+                attList.addAll(dbAttendance)
+                if (!attList.contains(attendance.name)) attList.add(attendance.name)
 
-            val newDbAttendance = AttendanceCacheEntity(programId, Attendance(programId, attList))
-            Log.e("indaba Repository", "newDbAtt: $newDbAttendance")
-            attendanceDao.insertOrUpdate(newDbAttendance)
-            emit(DataState.Success(true))
+                val newDbAttendance = AttendanceCacheEntity(programId, Attendance(programId, attList))
+                attendanceDao.insertOrUpdate(newDbAttendance)
+                emit(DataState.Success(true))
+            }else {
+                val newDbAttendance = AttendanceCacheEntity(programId, Attendance(programId, listOf(attendance.name)))
+                attendanceDao.insertOrUpdate(newDbAttendance)
+                emit(DataState.Success(true))
+            }
+
 //            Log.e("indaba Repository", "After emit program")
         }catch (e:Exception) {
-            Log.e("indaba Repository", "save Excep: ${e.message}")
             emit(DataState.Error(e))
         }
     }
@@ -193,16 +200,15 @@ constructor(
         }
     }
 
-    suspend fun syncAttendance(){
-        Log.e("indaba Repository", "start Sync")
-        val cachedAttendance = attendanceDao.get()
-        for (dbAtt in cachedAttendance){
-            for (name in dbAtt.name.attendanceList) {
-                val atten = AttendanceOnlineEntity(name = name)
-                storageService.updateAttendance(dbAtt.programId, atten)
-
-            }
-        }
-        Log.e("indaba Repository", "end Sync")
-    }
+//    suspend fun syncAttendance(){
+//        Log.e("indaba Repository", "start Sync")
+//        val cachedAttendance = attendanceDao.get()
+//        for (dbAtt in cachedAttendance){
+//            for (name in dbAtt.name.attendanceList) {
+//                val atten = AttendanceOnlineEntity(name = name)
+//                storageService.updateAttendance(dbAtt.programId, atten)
+//            }
+//        }
+//        Log.e("indaba Repository", "end Sync")
+//    }
 }
