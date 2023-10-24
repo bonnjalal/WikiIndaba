@@ -151,6 +151,18 @@ class MainViewModel
             mainRepository.syncAttendance()
         }
     }*/
+
+    var searchOrganizerState = mutableStateOf("")
+        private set
+    fun onOrganizerSearchChange(newValue: String) {
+        searchOrganizerState.value = newValue
+    }
+
+    var searchAttendeeState = mutableStateOf("")
+        private set
+    fun onAttendeeSearchChange(newValue: String) {
+        searchAttendeeState.value = newValue
+    }
     /**
      * Program logic
      */
@@ -162,6 +174,7 @@ class MainViewModel
     }
 
     var attendeesList = mutableListOf<Attendee>()
+    var attendance = mutableStateOf(Attendance("", emptyList()))
 
 
 //    private val _dataStateAttendee : MutableLiveData<DataState<List<Attendee>>> = MutableLiveData()
@@ -194,6 +207,10 @@ class MainViewModel
         manualAttendanceState.value = newValue
     }
 
+    var showAttendees = mutableStateOf(false)
+        private set
+    var showOrganizers = mutableStateOf(false)
+        private set
 
     var showPrograms = mutableStateOf(false)
         private set
@@ -246,6 +263,7 @@ class MainViewModel
 //                        Log.e("View Model", "attendance: ${dataState.toString()}")
                         showAttendance.value = when (dataState) {
                             is DataState.Success -> {
+                                attendance.value = dataState.data
                                 true
                             }
                             is DataState.Error -> {

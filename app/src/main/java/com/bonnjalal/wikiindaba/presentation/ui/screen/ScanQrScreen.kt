@@ -81,7 +81,10 @@ fun ScanQrScreen (openAndPopUp: (String, String) -> Unit,popup: () -> Unit, vm:M
                  * needs more logic to check if the name is in the attendees list
                  */
                 val isInAttendees = vm.checkAttendee(value)
-                if (isInAttendees){
+                if (vm.attendance.value.attendanceList.contains(value)){
+                    SnackbarManager.showMessage(SnackbarMessage.StringSnackbar("The participant ($value) already in the room"))
+                }
+                else if (isInAttendees){
                     vm.setStateEvent(MainStateEvent.SaveAttendanceEvent(vm.program.value!!.id, AttendanceOnlineEntity(value)))
                     vm.setStateEvent(MainStateEvent.GetAttendanceEvent)
                 }else {
