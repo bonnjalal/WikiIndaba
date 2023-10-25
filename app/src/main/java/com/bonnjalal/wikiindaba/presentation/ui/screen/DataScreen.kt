@@ -132,7 +132,7 @@ fun TabsScreen(navigate: (String) -> Unit,logout:(String) -> Unit, vm: MainViewM
                         OrganizerScreen(modifier = Modifier.fillMaxSize(),vm = vm)
                     }
                     2 -> {
-                        AttendeeScreen()
+                        AttendeeScreen(modifier = Modifier.fillMaxSize(),vm = vm)
                     }
                 }
             }

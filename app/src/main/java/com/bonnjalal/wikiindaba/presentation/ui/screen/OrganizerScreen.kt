@@ -70,6 +70,7 @@ fun OrganizerScreen(modifier: Modifier= Modifier, vm: MainViewModel){
 
     val showOrganizers by remember {vm.showAttendees}
 
+
     LaunchedEffect(key1 = Unit, block = {
 //        vm.syncAttendance()
         vm.setStateEvent(MainStateEvent.GetAttendeesEvent)
