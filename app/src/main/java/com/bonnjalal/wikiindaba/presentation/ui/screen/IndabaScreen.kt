@@ -69,10 +69,14 @@ fun IndabaScreen(vm:MainViewModel = hiltViewModel()) {
                         vm = vm,
                         navigateAndPopup = { route, popup -> appState.navigateAndPopUp(route, popup) }) }
                     composable(PROGRAM_SCREEN) {
-                        ProgramScreen(
+                        TabsScreen(
                             vm = vm,
                             navigate = { route -> appState.navigate(route) },
                             logout = {route -> appState.clearAndNavigate(route)})
+//                        ProgramScreen(
+//                            vm = vm,
+//                            navigate = { route -> appState.navigate(route) },
+//                            logout = {route -> appState.clearAndNavigate(route)})
                     }
                     composable(SCAN_QR_SCREEN) {
                         ScanQrScreen(

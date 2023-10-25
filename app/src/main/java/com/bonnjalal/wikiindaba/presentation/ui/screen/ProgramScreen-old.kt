@@ -61,7 +61,7 @@ import com.slaviboy.composeunits.sh
 
 
 @Composable
-fun ProgramScreen(modifier: Modifier=Modifier,navigate: (String) -> Unit, vm: MainViewModel){
+fun ProgramScreenOld(navigate: (String) -> Unit,logout:(String) -> Unit, vm: MainViewModel){
 
     val uiState by vm.searchProgramState
     val userStateAnonymous by vm.userState.collectAsStateWithLifecycle(initialValue = false)
@@ -76,23 +76,65 @@ fun ProgramScreen(modifier: Modifier=Modifier,navigate: (String) -> Unit, vm: Ma
         }
     })
 
-    Column (modifier = modifier
-//            .fillMaxWidth(0.85f)
-        ) {
+    ConstraintLayout(modifier = Modifier
+        .fillMaxSize()
+        .background(color = Color(0xFFA39274))) {
 
-        if (showPrograms) {
+        val (logo, col1) = createRefs()
+
+        Row (modifier = Modifier
+            .constrainAs(logo) {
+                height = Dimension.wrapContent
+                width = Dimension.fillToConstraints
+                top.linkTo(parent.top, margin = 0.008.dh)
+                start.linkTo(parent.start)
+                end.linkTo(parent.end)
+            }){
+
+            Spacer(modifier = Modifier.fillMaxWidth(0.1f))
+            Image(modifier = Modifier
+                .width(0.25.dw)
+                .height(0.035.dh)
+                .align(Alignment.CenterVertically)
+//            .size(width = 160.dp, height = 60.dp)
+                , imageVector = ImageVector.vectorResource(id = R.drawable.logo_wikiindaba),
+                contentDescription = "indaba logo", contentScale = ContentScale.FillBounds)
+
+            Spacer(modifier = Modifier.fillMaxWidth(0.7f))
+            IconButton(onClick = { vm.onSignOut(logout) }, modifier = Modifier.align(Alignment.CenterVertically)) {
+                Icon(painter = painterResource(id = R.drawable.material_symbols_logout),
+                    contentDescription = "logout logo", tint = Color(0xFFF5EEDF)
+                )
+            }
+        }
+
+        Column (modifier = Modifier
+//            .fillMaxWidth(0.85f)
+            .background(
+                color = Color.White,
+                shape = RoundedCornerShape(topStart = 0.035.dh, topEnd = 0.035.dh)
+            )
+            .constrainAs(col1) {
+                top.linkTo(logo.bottom, margin = 0.015.dh)
+                start.linkTo(parent.start)
+                end.linkTo(parent.end)
+                bottom.linkTo(parent.bottom)
+                height = Dimension.fillToConstraints
+                width = Dimension.fillToConstraints
+            }) {
+
             Spacer(Modifier.height(35.dp))
             Row (modifier = Modifier
-                .fillMaxWidth()
+                .fillMaxWidth(0.85f)
                 .align(Alignment.CenterHorizontally)) {
-    //                Spacer(Modifier.fillMaxWidth(0.1f))
+//                Spacer(Modifier.fillMaxWidth(0.1f))
                 Text(
                     modifier = Modifier.align(Alignment.CenterVertically),
                     text = "Hello, There",
                     style = TextStyle(
                         fontSize = 0.025.sh,
-    //                        lineHeight = 17.sp,
-    //                        fontFamily = FontFamily(Font(R.font.inter)),
+//                        lineHeight = 17.sp,
+//                        fontFamily = FontFamily(Font(R.font.inter)),
                         fontWeight = FontWeight(600),
                         color = Color(0xFF000000),
                     )
@@ -113,78 +155,79 @@ fun ProgramScreen(modifier: Modifier=Modifier,navigate: (String) -> Unit, vm: Ma
             Spacer(Modifier.height(0.035.dh))
             SearchField(uiState, vm::onProgramSearchChange,
                 modifier = Modifier
-                    .fillMaxWidth()
+                    .fillMaxWidth(0.85f)
                     .height(0.04.dh)
-    //                    .defaultMinSize(minHeight = 20.dp, minWidth = 150.dp)
+//                    .defaultMinSize(minHeight = 20.dp, minWidth = 150.dp)
                     .align(Alignment.CenterHorizontally))
 
             Spacer(Modifier.height(0.03.dh))
 
+            if (showPrograms) {
+                var cardColor by remember { mutableStateOf(Color(0xFFF5EEDF))}
+                LazyColumn(modifier = Modifier.align(Alignment.CenterHorizontally)) {
 
-            var cardColor by remember { mutableStateOf(Color(0xFFF5EEDF))}
-            LazyColumn(modifier = Modifier.align(Alignment.CenterHorizontally)) {
-
-                items((vm.dataStateProgram.value as DataState.Success).data.filter {
-                    val time = vm.getDateTime(it.startTime, it.endTime)
-                    it.title.contains(uiState, ignoreCase = true) ||
-                            it.room.contains(uiState, ignoreCase = true) || it.authors.contains(uiState, ignoreCase = true)
-                            || time.contains(uiState, ignoreCase = true)
-                },
-                    key = {it.id}) { program ->
+                    items((vm.dataStateProgram.value as DataState.Success).data.filter {
+                        val time = vm.getDateTime(it.startTime, it.endTime)
+                        it.title.contains(uiState, ignoreCase = true) ||
+                                it.room.contains(uiState, ignoreCase = true) || it.authors.contains(uiState, ignoreCase = true)
+                                || time.contains(uiState, ignoreCase = true)
+                    },
+                        key = {it.id}) { program ->
 //                        val time = vm.getDateTime(program.startTime, program.endTime)
-                    val programState = vm.compareDates(program.startTime, program.endTime)
-                    cardColor = when (programState){
-                        ProgramStartState.NOW -> Color(0xFFDAF5D6)
-                        ProgramStartState.SOON -> Color(0xFFF2F3CF)
-                        ProgramStartState.NONE -> Color(0xFFF5EEDF)
+                        val programState = vm.compareDates(program.startTime, program.endTime)
+                        cardColor = when (programState){
+                            ProgramStartState.NOW -> Color(0xFFDAF5D6)
+                            ProgramStartState.SOON -> Color(0xFFF2F3CF)
+                            ProgramStartState.NONE -> Color(0xFFF5EEDF)
+                        }
+
+                        ProgramCard(
+                            modifier = Modifier
+                                .fillMaxWidth(0.85f)
+                                .align(Alignment.CenterHorizontally)
+                                .clickable {
+                                    vm.program.value = program
+                                    vm.setStateEvent(MainStateEvent.GetAttendanceEvent)
+                                    if (!userStateAnonymous) navigate(SCAN_QR_SCREEN)
+                                }.background(color = cardColor, shape = RoundedCornerShape(size = 0.012.dh)),
+                            title = program.title,
+                            room = program.room,
+                            time = vm.getDateTime(program.startTime, program.endTime),
+                            authors = program.authors
+                        )
+                        Spacer(Modifier.height(0.01.dh))
                     }
-
-                    ProgramCard(
-                        modifier = Modifier
-                            .fillMaxWidth()
+                    /*items(10) {
+                        ProgramCard(modifier = Modifier
+                            .fillMaxWidth(0.85f)
                             .align(Alignment.CenterHorizontally)
-                            .clickable(!userStateAnonymous) {
-                                vm.program.value = program
-                                vm.setStateEvent(MainStateEvent.GetAttendanceEvent)
+                            .clickable {
                                 if (!userStateAnonymous) navigate(SCAN_QR_SCREEN)
-                            }.background(color = cardColor, shape = RoundedCornerShape(size = 0.012.dh)),
-                        title = program.title,
-                        room = program.room,
-                        time = vm.getDateTime(program.startTime, program.endTime),
-                        authors = program.authors
-                    )
-                    Spacer(Modifier.height(0.01.dh))
-                }
-                /*items(10) {
-                    ProgramCard(modifier = Modifier
-                        .fillMaxWidth(0.85f)
-                        .align(Alignment.CenterHorizontally)
-                        .clickable {
-                            if (!userStateAnonymous) navigate(SCAN_QR_SCREEN)
-                        })
-                    Spacer(Modifier.height(0.01.dh))
+                            })
+                        Spacer(Modifier.height(0.01.dh))
 
-                }*/
+                    }*/
 
-                // Add another single item
+                    // Add another single item
 //                item {
 //                    Text(text = "Last item")
 //                }
-            }
-        }else {
-            Column (modifier = Modifier.align(Alignment.CenterHorizontally)){
-                CircularProgressIndicator(modifier = Modifier.align(Alignment.CenterHorizontally),
-                    color = Color(0xFFF5EEDF))
-                Text(modifier = Modifier.align(Alignment.CenterHorizontally),
-                    text = "Loading programs ...", color = Color(0xFF531B1C),
-                    fontSize = 0.013.sh)
+                }
+            }else {
+                Column (modifier = Modifier.align(Alignment.CenterHorizontally)){
+                    CircularProgressIndicator(modifier = Modifier.align(Alignment.CenterHorizontally),
+                        color = Color(0xFFF5EEDF))
+                    Text(modifier = Modifier.align(Alignment.CenterHorizontally),
+                        text = "Loading programs ...", color = Color(0xFF531B1C),
+                        fontSize = 0.013.sh)
+                }
             }
         }
     }
 }
 
 
-@OptIn(ExperimentalMaterial3Api::class)
+/*@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SearchField(value: String,  onNewValue: (String) -> Unit, modifier: Modifier = Modifier) {
 
@@ -223,9 +266,9 @@ fun SearchField(value: String,  onNewValue: (String) -> Unit, modifier: Modifier
         ) , onValueChange = {
             onNewValue(it)
         })
-}
+}*/
 
-@Composable
+/*@Composable
 fun ProgramCard(modifier: Modifier, title:String, authors:String, room:String, time:String){
     Column (modifier = modifier
 //        .padding(horizontal = 8.dp)
@@ -289,7 +332,7 @@ fun ProgramCard(modifier: Modifier, title:String, authors:String, room:String, t
             )
         }
     }
-}
+}*/
 //@Preview
 //@Composable
 //fun PreviewProgamScreen(){

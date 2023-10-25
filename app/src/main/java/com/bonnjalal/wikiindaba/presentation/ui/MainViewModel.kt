@@ -224,8 +224,17 @@ class MainViewModel
                     mainRepository.getAttendees()
                         .onEach { dataState ->
                             _dataStateAttendee.value = dataState
-                            if (dataState is DataState.Success){
-                                attendeesList = dataState.data.toMutableList()
+                            showAttendees.value = when (dataState) {
+                                is DataState.Success -> {
+                                    attendeesList = dataState.data.toMutableList()
+                                    true
+                                }
+                                is DataState.Error -> {
+                                    false
+                                }
+                                is DataState.Loading -> {
+                                    false
+                                }
                             }
                         }
                         .launchIn(viewModelScope)

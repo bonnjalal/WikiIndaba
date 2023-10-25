@@ -10,10 +10,15 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Email
+import androidx.compose.material.icons.filled.PersonPin
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -28,9 +33,11 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.TextStyle
@@ -42,9 +49,13 @@ import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import coil.compose.AsyncImage
+import coil.request.ImageRequest
 import com.bonnjalal.wikiindaba.R
 import com.bonnjalal.wikiindaba.common.SCAN_QR_SCREEN
 import com.bonnjalal.wikiindaba.common.compose.CustomTextField
+import com.bonnjalal.wikiindaba.presentation.model.Attendee
+import com.bonnjalal.wikiindaba.presentation.model.Organizer
 import com.bonnjalal.wikiindaba.presentation.state.DataState
 import com.bonnjalal.wikiindaba.presentation.state.ProgramStartState
 import com.bonnjalal.wikiindaba.presentation.ui.MainStateEvent
@@ -55,84 +66,27 @@ import com.slaviboy.composeunits.sh
 
 
 @Composable
-fun OrganizerScreen(logout:(String) -> Unit, vm: MainViewModel = hiltViewModel()){
+fun OrganizerScreen(modifier: Modifier= Modifier, vm: MainViewModel){
 
-    val uiState by vm.searchOrganizerState
-    val userStateAnonymous by vm.userState.collectAsStateWithLifecycle(initialValue = false)
-//    val programState by vm.dataStateProgram.collectAsStateWithLifecycle()
-    val showOrganizers by remember {vm.showOrganizers}
+    val showOrganizers by remember {vm.showAttendees}
 
     LaunchedEffect(key1 = Unit, block = {
 //        vm.syncAttendance()
-        vm.setStateEvent(MainStateEvent.GetOrganizersEvent)
+        vm.setStateEvent(MainStateEvent.GetAttendeesEvent)
+//        vm.setStateEvent(MainStateEvent.GetOrganizersEvent)
 //        if (!userStateAnonymous){
 //            vm.setStateEvent(MainStateEvent.GetAttendeesEvent)
 //        }
     })
 
-//    var showPrograms by remember { mutableStateOf(false) }
-//    var showLoadingBar by remember { mutableStateOf(true) }
 
-//    Log.e("indaba ViewModel", "dataState success show: ${vm.showPrograms}")
-//    LaunchedEffect(key1 = programState, block = {
-//        showPrograms = when (programState) {
-//            is DataState.Success -> {
-//                true
-//            }
-//            is DataState.Error -> {
-//                false
-//            }
-//            is DataState.Loading -> {
-//                false
-//            }
-//        }
-//    } )
-    ConstraintLayout(modifier = Modifier
-        .fillMaxSize()
-        .background(color = Color(0xFFA39274))) {
-
-        val (logo, col1) = createRefs()
-
-        Row (modifier = Modifier
-            .constrainAs(logo) {
-                height = Dimension.wrapContent
-                width = Dimension.fillToConstraints
-                top.linkTo(parent.top, margin = 0.008.dh)
-                start.linkTo(parent.start)
-                end.linkTo(parent.end)
-            }){
-
-            Spacer(modifier = Modifier.fillMaxWidth(0.1f))
-            Image(modifier = Modifier
-                .width(0.25.dw)
-                .height(0.035.dh)
-                .align(Alignment.CenterVertically)
-//            .size(width = 160.dp, height = 60.dp)
-                , imageVector = ImageVector.vectorResource(id = R.drawable.logo_wikiindaba),
-                contentDescription = "indaba logo", contentScale = ContentScale.FillBounds)
-
-            Spacer(modifier = Modifier.fillMaxWidth(0.7f))
-            IconButton(onClick = { vm.onSignOut(logout) }, modifier = Modifier.align(Alignment.CenterVertically)) {
-                Icon(painter = painterResource(id = R.drawable.material_symbols_logout),
-                    contentDescription = "logout logo", tint = Color(0xFFF5EEDF)
-                )
-            }
-        }
-
-        Column (modifier = Modifier
+    Column (modifier = modifier
 //            .fillMaxWidth(0.85f)
-            .background(
-                color = Color.White,
-                shape = RoundedCornerShape(topStart = 0.035.dh, topEnd = 0.035.dh)
-            )
-            .constrainAs(col1) {
-                top.linkTo(logo.bottom, margin = 0.015.dh)
-                start.linkTo(parent.start)
-                end.linkTo(parent.end)
-                bottom.linkTo(parent.bottom)
-                height = Dimension.fillToConstraints
-                width = Dimension.fillToConstraints
-            }) {
+//            .background(
+//                color = Color.White,
+//                shape = RoundedCornerShape(topStart = 0.035.dh, topEnd = 0.035.dh)
+//            )
+            ) {
 
             Spacer(Modifier.height(0.035.dh))
             /*SearchOrganizerField(uiState, vm::onOrganizerSearchChange,
@@ -145,41 +99,30 @@ fun OrganizerScreen(logout:(String) -> Unit, vm: MainViewModel = hiltViewModel()
             Spacer(Modifier.height(0.03.dh))*/
 
             if (showOrganizers) {
-                var cardColor by remember { mutableStateOf(Color(0xFFF5EEDF)) }
                 LazyColumn(modifier = Modifier.align(Alignment.CenterHorizontally)) {
 
-                    items((vm.dataStateProgram.value as DataState.Success).data.filter {
-                        val time = vm.getDateTime(it.startTime, it.endTime)
-                        it.title.contains(uiState, ignoreCase = true) ||
-                                it.room.contains(uiState, ignoreCase = true) || it.authors.contains(uiState, ignoreCase = true)
-                                || time.contains(uiState, ignoreCase = true)
+                    items((vm.dataStateAttendee.value as DataState.Success).data.filter {
+                        it.role.contains("Core Team organizer", ignoreCase = true) ||
+                                it.role.contains("Organizer - Fiscal Sponsor", ignoreCase = true)
+                                || it.role.contains("Organizer", ignoreCase = true)
                     },
-                        key = {it.id}) { program ->
+                        key = {it.id}) { organizer ->
 //                        val time = vm.getDateTime(program.startTime, program.endTime)
-                        val programState = vm.compareDates(program.startTime, program.endTime)
-                        cardColor = when (programState){
-                            ProgramStartState.NOW -> Color(0xFFDAF5D6)
-                            ProgramStartState.SOON -> Color(0xFFF2F3CF)
-                            ProgramStartState.NONE -> Color(0xFFF5EEDF)
-                        }
 
                         OrganizerCard(
                             modifier = Modifier
-                                .fillMaxWidth(0.85f)
+                                .fillMaxWidth()
                                 .align(Alignment.CenterHorizontally)
-                                .clickable {
-                                    vm.program.value = program
-                                    vm.setStateEvent(MainStateEvent.GetAttendanceEvent)
-//                                    if (!userStateAnonymous) navigate(SCAN_QR_SCREEN)
-                                }
+//                                .clickable {
+//                                    vm.program.value = program
+//                                    vm.setStateEvent(MainStateEvent.GetAttendanceEvent)
+////                                    if (!userStateAnonymous) navigate(SCAN_QR_SCREEN)
+//                                }
                                 .background(
-                                    color = cardColor,
+                                    color = Color(0xFFF5EEDF),
                                     shape = RoundedCornerShape(size = 0.012.dh)
                                 ),
-                            title = program.title,
-                            room = program.room,
-                            time = vm.getDateTime(program.startTime, program.endTime),
-                            authors = program.authors
+                            organizer =  organizer
                         )
                         Spacer(Modifier.height(0.01.dh))
                     }
@@ -191,12 +134,11 @@ fun OrganizerScreen(logout:(String) -> Unit, vm: MainViewModel = hiltViewModel()
                         color = Color(0xFFF5EEDF)
                     )
                     Text(modifier = Modifier.align(Alignment.CenterHorizontally),
-                        text = "Loading programs ...", color = Color(0xFF531B1C),
+                        text = "Loading organizers ...", color = Color(0xFF531B1C),
                         fontSize = 0.013.sh)
                 }
             }
         }
-    }
 }
 
 
@@ -242,74 +184,86 @@ fun SearchOrganizerField(value: String,  onNewValue: (String) -> Unit, modifier:
 }
 
 @Composable
-fun OrganizerCard(modifier: Modifier, title:String, authors:String, room:String, time:String){
-    Column (modifier = modifier
+fun OrganizerCard(modifier: Modifier, organizer:Attendee){
+    Row (modifier = modifier.padding(start = 0.016.dw, top = 0.016.dw)
 //        .padding(horizontal = 8.dp)
     ) {
-
-        Text(
-            modifier = Modifier.padding(start = 0.03.dw, top = 8.dp, end = 0.03.dw),
-            text = title,
-            style = TextStyle(
-                fontSize = 0.016.sh,
+//        val imgUrl = if (organizer.imgUrl == "") "https://upload.wikimedia.org/wikipedia/commons/f/f8/Profile_photo_placeholder_square.svg"
+//                    else organizer.imgUrl
+        AsyncImage(
+            model = ImageRequest.Builder(LocalContext.current)
+                .data(
+                    if (organizer.imgUrl == "") "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f8/Profile_photo_placeholder_square.svg/640px-Profile_photo_placeholder_square.svg.png"
+                    else organizer.imgUrl
+                )
+                .crossfade(true)
+                .build(),
+            placeholder = painterResource(R.drawable.placeholder),
+            contentDescription = "Organizer Image",
+            contentScale = ContentScale.Crop,
+            modifier = Modifier.clip(CircleShape).size(0.1.dh).align(Alignment.CenterVertically)
+        )
+        Column {
+            Text(
+                modifier = Modifier.padding(start = 0.03.dw, top = 8.dp, end = 0.03.dw),
+                text = organizer.name,
+                style = TextStyle(
+                    fontSize = 0.016.sh,
 //                lineHeight = 17.sp,
 //                fontFamily = FontFamily(Font(R.font.inter)),
-                fontWeight = FontWeight(500),
-                color = Color(0xFF531B1C),
+                    fontWeight = FontWeight(500),
+                    color = Color(0xFF531B1C),
+                )
             )
-        )
-        Text(
-            modifier = Modifier.padding(start = 0.03.dw, top = 0.004.dh, end = 0.03.dw),
-            text = authors,
-            style = TextStyle(
-                fontSize = 0.013.sh,
+            Text(
+                modifier = Modifier.padding(start = 0.03.dw, top = 0.004.dh, end = 0.03.dw),
+                text = organizer.role,
+                style = TextStyle(
+                    fontSize = 0.013.sh,
 //                lineHeight = 17.sp,
 //                fontFamily = FontFamily(Font(R.font.inter)),
-                fontWeight = FontWeight(400),
-                color = Color(0xFF531B1C),
-            )
-        )
-        Row (modifier = Modifier.padding(horizontal = 0.016.dh, vertical = 0.008.dh)) {
-            Icon(
-                modifier = Modifier.padding(1.dp),
-                imageVector = ImageVector.vectorResource(id = R.drawable.location_icon),
-                contentDescription = "location icon",
-                tint = Color(0xFFA1A1A1) )
-            Text(
-                modifier = Modifier.padding(horizontal = 0.016.dw),
-                text = room,
-                style = TextStyle(
-                    fontSize = 0.011.sh,
-//                    lineHeight = 17.sp,
-//                    fontFamily = FontFamily(Font(R.font.inter)),
-                    fontWeight = FontWeight(500),
-                    color = Color(0xFFA1A1A1),
+                    fontWeight = FontWeight(400),
+                    color = Color(0xFF531B1C),
                 )
             )
+            Row (modifier = Modifier.padding(horizontal = 0.016.dh, vertical = 0.008.dh)) {
+                Icon(
+                    modifier = Modifier.padding(1.dp).align(Alignment.CenterVertically),
+                    imageVector = Icons.Filled.PersonPin,//ImageVector.vectorResource(id = R.drawable.location_icon),
+                    contentDescription = "location icon",
+                    tint = Color(0xFFA1A1A1) )
+                Text(
+                    modifier = Modifier.padding(horizontal = 0.016.dw).align(Alignment.CenterVertically),
+                    text = organizer.username,
+                    style = TextStyle(
+                        fontSize = 0.011.sh,
+//                    lineHeight = 17.sp,
+//                    fontFamily = FontFamily(Font(R.font.inter)),
+                        fontWeight = FontWeight(500),
+                        color = Color(0xFFA1A1A1),
+                    )
+                )
 
-            Icon(
-                modifier = Modifier.padding(1.dp),
-                imageVector = ImageVector.vectorResource(id = R.drawable.clock_icon),
-                contentDescription = "location icon",
-                tint = Color(0xFFA1A1A1)
-            )
-            Text(
-                modifier = Modifier.padding(horizontal = 0.016.dw),
-                text = time,
-                style = TextStyle(
-                    fontSize = 0.011.sh,
+                Icon(
+                    modifier = Modifier.padding(1.dp).align(Alignment.CenterVertically),
+                    imageVector = Icons.Filled.Email,//ImageVector.vectorResource(id = R.drawable.clock_icon),
+                    contentDescription = "location icon",
+                    tint = Color(0xFFA1A1A1)
+                )
+                Text(
+                    modifier = Modifier.padding(horizontal = 0.016.dw).align(Alignment.CenterVertically),
+                    text = organizer.email,
+                    style = TextStyle(
+                        fontSize = 0.011.sh,
 //                    lineHeight = 17.sp,
 //                    fontFamily = FontFamily(Font(R.font.inter)),
-                    fontWeight = FontWeight(500),
-                    color = Color(0xFFA1A1A1),
+                        fontWeight = FontWeight(500),
+                        color = Color(0xFFA1A1A1),
+                    )
                 )
-            )
+            }
         }
-    }
-}
 
-@Preview
-@Composable
-fun prevOrganizer(){
-    OrganizerScreen({})
+
+    }
 }

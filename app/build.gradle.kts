@@ -130,6 +130,9 @@ dependencies {
 
     implementation("androidx.compose.material:material-icons-extended-android:1.5.4")
 
+    // Image loader for compose
+    implementation("io.coil-kt:coil-compose:2.4.0")
+
 }
 
 // Allow references to generated code
