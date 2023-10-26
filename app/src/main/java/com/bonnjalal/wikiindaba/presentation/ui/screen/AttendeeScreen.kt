@@ -56,7 +56,7 @@ import com.slaviboy.composeunits.sh
 @Composable
 fun AttendeeScreen(modifier: Modifier = Modifier, vm: MainViewModel){
 
-    val showOrganizers by remember {vm.showAttendees}
+    val showAttendees by remember {vm.showAttendees}
     val uiState by vm.searchAttendeeState
 
     LaunchedEffect(key1 = Unit, block = {
@@ -86,10 +86,11 @@ fun AttendeeScreen(modifier: Modifier = Modifier, vm: MainViewModel){
 
         Spacer(Modifier.height(0.03.dh))
 
-        if (showOrganizers) {
+        if (showAttendees) {
             LazyColumn(modifier = Modifier.align(Alignment.CenterHorizontally)) {
 
-                items((vm.dataStateAttendee.value as DataState.Success).data.filter {
+//                items((vm.dataStateAttendee.value as DataState.Success).data.filter {
+                items(vm.attendeesList.filter {
                     it.name.contains(uiState, ignoreCase = true) ||
                             it.room.contains(uiState, ignoreCase = true) || it.phoneNumber.contains(uiState, ignoreCase = true)
                             || it.role.contains(uiState, ignoreCase = true) || it.username.contains(uiState, ignoreCase = true)

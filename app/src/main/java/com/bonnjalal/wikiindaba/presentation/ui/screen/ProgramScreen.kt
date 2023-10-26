@@ -124,7 +124,8 @@ fun ProgramScreen(modifier: Modifier=Modifier,navigate: (String) -> Unit, vm: Ma
             var cardColor by remember { mutableStateOf(Color(0xFFF5EEDF))}
             LazyColumn(modifier = Modifier.align(Alignment.CenterHorizontally)) {
 
-                items((vm.dataStateProgram.value as DataState.Success).data.filter {
+//                items((vm.dataStateProgram.value as DataState.Success).data.filter {
+                items(vm.programs.filter {
                     val time = vm.getDateTime(it.startTime, it.endTime)
                     it.title.contains(uiState, ignoreCase = true) ||
                             it.room.contains(uiState, ignoreCase = true) || it.authors.contains(uiState, ignoreCase = true)

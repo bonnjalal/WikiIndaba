@@ -101,13 +101,14 @@ fun OrganizerScreen(modifier: Modifier= Modifier, vm: MainViewModel){
             if (showOrganizers) {
                 LazyColumn(modifier = Modifier.align(Alignment.CenterHorizontally)) {
 
-                    items((vm.dataStateAttendee.value as DataState.Success).data.filter {
+//                    items((vm.dataStateAttendee.value as DataState.Success).data.filter {
+                    items(vm.attendeesList.filter {
                         it.role.contains("Speaker", ignoreCase = true) &&
                                 it.name.contains(uiState, ignoreCase = true)
 //                        it.role.contains("Core Team organizer", ignoreCase = true) ||
 //                                it.role.contains("Organizer - Fiscal Sponsor", ignoreCase = true)
 //                                || it.role.contains("Organizer", ignoreCase = true)
-                                                                                        
+
                     },
                         key = {it.id}) { organizer ->
 //                        val time = vm.getDateTime(program.startTime, program.endTime)
@@ -346,10 +347,11 @@ fun DialogWithImage(
                     var cardColor by remember { mutableStateOf(Color(0xFFF5EEDF))}
                     LazyColumn(modifier = Modifier
                         .padding(0.008.dh)
-                        .height(0.24.dh)
+                        .height(0.26.dh)
                         .align(Alignment.CenterHorizontally)) {
 
-                        items((vm.dataStateProgram.value as DataState.Success).data.filter {
+//                        items((vm.dataStateProgram.value as DataState.Success).data.filter {
+                        items(vm.programs.filter {
                             it.authorsName.contains(organizer.name, ignoreCase = true)
                         },
                             key = {it.id}) { program ->

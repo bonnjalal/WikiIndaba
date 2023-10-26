@@ -179,7 +179,10 @@ fun LoginScreen(navigateAndPopup: (String, String) -> Unit, vm: MainViewModel = 
                 )
             }
 
+
+
             Spacer(modifier = Modifier.height(0.012.dh))
+
             OutlinedButton(
                 modifier = Modifier
 //                    .offset(x = 0.07.dw, y = 0.2.dh)
@@ -190,7 +193,7 @@ fun LoginScreen(navigateAndPopup: (String, String) -> Unit, vm: MainViewModel = 
                 shape = RoundedCornerShape(size = 0.01.dh),
                 onClick = { vm.onSignInAnonymously(navigateAndPopup)}) {
                 Text(
-                    text = "Sign in Anonymously",
+                    text = "View the program",
                     style = TextStyle(
                         fontSize = 0.02.sh,
 //                        fontFamily = FontFamily(Font(R.font.poppins)),
@@ -199,6 +202,18 @@ fun LoginScreen(navigateAndPopup: (String, String) -> Unit, vm: MainViewModel = 
                     )
                 )
             }
+            Text(
+                modifier = Modifier.padding(top = 0.002.dh),
+                text = "You can view the Wiki Indaba conference program without sign in",
+                style = TextStyle(
+                    fontSize = 0.016.sh,
+//                    lineHeight = 17.sp,
+//                    fontFamily = FontFamily(Font(R.font.poppins)),
+                    fontWeight = FontWeight(500),
+                    color = Color(0xFFA1A1A1),
+                    textAlign = TextAlign.Justify,
+                )
+            )
 
             Spacer(modifier = Modifier.height(0.05.dh))
             Text(

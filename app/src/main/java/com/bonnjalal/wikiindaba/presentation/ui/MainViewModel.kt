@@ -175,6 +175,7 @@ class MainViewModel
 
     var attendeesList = mutableListOf<Attendee>()
     var attendance = mutableStateOf(Attendance("", emptyList()))
+    var programs = mutableListOf<Program>()
 
 
 //    private val _dataStateAttendee : MutableLiveData<DataState<List<Attendee>>> = MutableLiveData()
@@ -251,9 +252,13 @@ class MainViewModel
                 is MainStateEvent.GetProgramEvent -> {
                     mainRepository.getProgram()
                         .onEach { dataState ->
+
                             _dataStateProgram.value = dataState
                             showPrograms.value = when (dataState) {
+
                                 is DataState.Success -> {
+                                    val sortedList = dataState.data.sortedBy { it.startTime }
+                                    programs = sortedList.toMutableList()
                                     true
                                 }
                                 is DataState.Error -> {
