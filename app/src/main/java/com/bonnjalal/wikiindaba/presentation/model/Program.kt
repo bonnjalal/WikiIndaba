@@ -1,6 +1,5 @@
 package com.bonnjalal.wikiindaba.presentation.model
 
-import com.google.firebase.Timestamp
 import java.util.Date
 
 data class Program(
@@ -10,6 +9,6 @@ data class Program(
     var startTime: Date,
     var endTime: Date,
     var room: String,
-    var responsible: String,
+    var authorsName: String,
     var slide: String
 )

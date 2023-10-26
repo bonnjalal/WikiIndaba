@@ -49,7 +49,7 @@ import com.slaviboy.composeunits.dw
 @Composable
 fun TabsScreen(navigate: (String) -> Unit,logout:(String) -> Unit, vm: MainViewModel){
     val userStateAnonymous by vm.userState.collectAsStateWithLifecycle(initialValue = false)
-    val tabList = if (userStateAnonymous) listOf("Program", "Organizers") else listOf("Program", "Organizers", "Attendees")
+    val tabList = if (userStateAnonymous) listOf("Program", "Speakers") else listOf("Program", "Speakers", "Attendees")
 
     var selectedTabIndex by remember { mutableIntStateOf(0) }
     val pagerState = rememberPagerState { tabList.size }

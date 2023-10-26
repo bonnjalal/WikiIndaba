@@ -1,10 +1,8 @@
 package com.bonnjalal.wikiindaba.data.db.cache_entity.mapper
 
 import com.bonnjalal.wikiindaba.data.db.cache_entity.ProgramCacheEntity
-import com.bonnjalal.wikiindaba.data.online.online_entity.ProgramOnlineEntity
 import com.bonnjalal.wikiindaba.data.online.online_entity.mapper.EntityOnlineMapper
 import com.bonnjalal.wikiindaba.presentation.model.Program
-import com.google.firebase.Timestamp
 import java.util.Date
 import javax.inject.Inject
 
@@ -20,7 +18,7 @@ class ProgramCacheMapper @Inject constructor(): EntityOnlineMapper<ProgramCacheE
             title = entity.title,
             authors = entity.authors,
             room = entity.room,
-            responsible = entity.responsible,
+            authorsName = entity.responsible,
             slide = entity.slide,
             startTime = Date(entity.startTime * 1000),
             endTime = Date(entity.endTime*1000)
@@ -33,7 +31,7 @@ class ProgramCacheMapper @Inject constructor(): EntityOnlineMapper<ProgramCacheE
             title = model.title,
             authors = model.authors,
             room = model.room,
-            responsible = model.responsible,
+            responsible = model.authorsName,
             slide = model.slide,
             startTime = model.startTime.time/1000,
             endTime = model.endTime.time/1000

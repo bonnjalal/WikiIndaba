@@ -2,6 +2,7 @@ package com.bonnjalal.wikiindaba.presentation.ui.screen
 
 import android.annotation.SuppressLint
 import android.content.res.Resources
+import android.view.Window
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -18,6 +19,7 @@ import androidx.compose.runtime.ReadOnlyComposable
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLayoutDirection
@@ -44,6 +46,7 @@ fun IndabaScreen(vm:MainViewModel = hiltViewModel()) {
 //    val navController = rememberNavController()
 
     CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Ltr ) {
+
         Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
 
             val appState = rememberAppState()
@@ -105,6 +108,7 @@ fun rememberAppState(
     remember(snackbarHostState, navController, snackbarManager, resources, coroutineScope) {
         IndabaAppState(snackbarHostState, navController, snackbarManager, resources, coroutineScope)
     }
+
 
 @Composable
 @ReadOnlyComposable

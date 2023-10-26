@@ -81,7 +81,7 @@ fun ProgramScreen(modifier: Modifier=Modifier,navigate: (String) -> Unit, vm: Ma
         ) {
 
         if (showPrograms) {
-            Spacer(Modifier.height(35.dp))
+            Spacer(Modifier.height(0.035.dh))
             Row (modifier = Modifier
                 .fillMaxWidth()
                 .align(Alignment.CenterHorizontally)) {

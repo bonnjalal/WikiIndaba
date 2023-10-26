@@ -132,6 +132,7 @@ dependencies {
 
     // Image loader for compose
     implementation("io.coil-kt:coil-compose:2.4.0")
+//    implementation("com.google.accompanist:accompanist-systemuicontroller:0.32.0")
 
 }
 

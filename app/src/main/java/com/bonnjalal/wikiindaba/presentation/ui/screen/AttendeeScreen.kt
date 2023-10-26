@@ -68,7 +68,6 @@ fun AttendeeScreen(modifier: Modifier = Modifier, vm: MainViewModel){
 //        }
     })
 
-
     Column (modifier = modifier
 //            .fillMaxWidth(0.85f)
 //            .background(
